@@ -47,7 +47,7 @@ PATCH {{nextApiUrl}}/users/me
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzVmZGVlYWQtYmM3Zi00NTVmLTgyZGYtZGE0NWQzOWRjZDdhIiwiZXhwIjoxNzIwNzcwNDA3LCJpYXQiOjE3MTI5OTQ0MDd9.Ebj0r0CFWCHqzmnc07Tk2HN4wo1ALNDgq_ImDbrDRWs
 {
-  "new_email": "john@gmail.com",
+  "new_email": "John@gmail.com",
   "new_password": "password123!",
   "new_subscriptions": ["ea12cd10-be78-49f6-b10a-0e1640b8e40f", "9d0aee7c-9bb9-450c-b073-28c91289ec8a"]
 }
