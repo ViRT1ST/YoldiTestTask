@@ -7,10 +7,10 @@ export default function WhoAmIAPI() {
   // console.log(user);
 
   useEffect(() => {
-    fetch('/api/whoami')
+    fetch('/api/debug')
       .then((res) => res.json())
-      .then(({ user }) => setUser(user.name));
+      .then(({ user }) => setUser(user?.name || user?.profile_name));
   }, []);
   
-  return <div className="mt-5">Who Am I (client): {user}</div>;
+  return <div>Who Am I (client): {user}</div>;
 }

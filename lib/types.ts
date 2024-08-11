@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /* =============================================================
-Database Full Schemas And Types
+Database Schemas And Types
 ============================================================= */
 
 export const DbUserSchema = z.object({
@@ -22,17 +22,16 @@ export type DbUser = z.infer<typeof DbUserSchema>;
 Other Types
 ============================================================= */
 
-export type ApiResponse = {
-  success: boolean;
-  code: number;
-  data: object | null;
-  message: string | null;
+export type AnyFieldsObject = {
+  [key: string]: any;
 };
 
-export type UserUpdateData = {
-  uuid: string;
-  new_email?: string | undefined;
-  new_password?: string | undefined;
-  new_username?: string | undefined;
+export type OauthProviders = 'google' | 'github';
+
+export type ApiResponse = {
+  success: boolean;
+  code: number | string;
+  data: object | null;
+  message: string | null;
 };
 

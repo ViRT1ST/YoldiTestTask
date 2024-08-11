@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 
 import yoldiSlice from '@/lib/frontend/store/slices/yoldi';
+import usersApi from '@/lib/frontend/store/apis/users';
 
 const {
   setIsUserAuthenticated,
@@ -54,13 +55,13 @@ export function useYoldiAuthState() {
 //   };
 // };
 
-// export const {
-//   useGetProfileQuery,
-//   useLoginUserMutation,
-//   useCreateUserMutation,
-//   useLogoutUserMutation,
-//   useUpdateUserMutation
-// } = usersApi;
+export const {
+  useGetProfileQuery,
+  useLoginUserMutation,
+  useCreateUserMutation,
+  useLogoutUserMutation,
+  useUpdateUserMutation
+} = usersApi;
 
 // export const {
 //   useFetchArticlesQuery,

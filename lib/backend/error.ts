@@ -1,10 +1,12 @@
 export default class ExtendedError extends Error {
-  public code: number;
+  public code: number | string;
 
-  constructor(code: number, message: string) {
-    // base constructor only accepts string message as an argument
-    // we extend it here to accept other values, allowing us to pass other data
+  constructor(code: number | string, message: string) {
     super(message);
+    this.name = this.constructor.name;
     this.code = code;
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
   }
 }

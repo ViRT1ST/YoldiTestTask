@@ -1,4 +1,4 @@
-import AuthForm from '@/components/yoldi/AuthForm';
+import AuthForm from '@/components/yoldi/auth/AuthForm';
 
 export const metadata = {
   title: 'Yoldi Auth Page',

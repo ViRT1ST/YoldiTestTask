@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { useSession } from 'next-auth/react';
+import { useState, useRef, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import tw from 'tailwind-styled-components';
+import Image from 'next/image';
 
 import {
   EditIcon,
@@ -10,9 +12,9 @@ import {
   UploadUpIcon,
   UploadImageIcon,
   UploadTrashIcon
-} from '@/components/yoldi/Icons';
-import ButtonNormal from '@/components/yoldi/ButtonNormal';
-import ProfileModal from '@/components/yoldi/ProfileModal';
+} from '@/components/yoldi/ui/Icons';
+import ButtonNormal from '@/components/yoldi/ui/ButtonNormal';
+import ProfileModal from '@/components/yoldi/profile/ProfileModal';
 
 const changeCoverData = {
   upload: {
@@ -27,9 +29,19 @@ const changeCoverData = {
   }
 };
 
-export default function Profile() {
-  const session = useSession();
-  console.log('data', session?.data);
+export default function Profile({
+  data,
+  onSaveData
+}: {
+  data: any;
+  onSaveData: (data: any) => void
+}) {
+  const router = useRouter();
+
+  const { isAuthenticated, providerStamp, name, avatar, cover, about } = data;
+  console.log(data);
+
+  const nameFirstLetter = name.charAt(0) as string;
 
   const [isCoverExist, setIsCoverExist] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,6 +51,11 @@ export default function Profile() {
   const changeCoverButtonData = isCoverExist
     ? changeCoverData.remove
     : changeCoverData.upload;
+
+  // useEffect(() => {
+    
+  //   console.log('refreshed');
+  // }, [name, avatar, idForUrl, cover, about]);
 
   const inputFileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hasFile = Boolean(e.target.files?.length);
@@ -52,9 +69,17 @@ export default function Profile() {
 
   return (
     <PageContainer>
-      <ProfileModal isOpen={isModalOpen} close={() => setIsModalOpen(false)}/>
+      <ProfileModal
+        isOpen={isModalOpen}
+        data={data}
+        onSaveData={onSaveData}
+        close={() => setIsModalOpen(false)}
+      />
 
       <CoverContainer>
+
+      {isAuthenticated && (
+        <>
           <input
             ref={hiddenFileInputRef}
             className="hidden"
@@ -62,6 +87,7 @@ export default function Profile() {
             type="file"
             accept="image/png, image/jpeg"
           />
+
           <CoverEditButton
             onClick={coverEditHandler}
             title={''}
@@ -74,45 +100,65 @@ export default function Profile() {
               <UploadImageIcon />
             </SvgContainer>
           </CoverEditButton>
+        </>
+      )}
 
       </CoverContainer>
 
       <InfoContainer>
         <InfoLimiter>
-          <UserAvatar>B</UserAvatar>
+
+          <UserAvatarContainer>
+          {avatar ? (
+            <Image
+              src={avatar}
+              alt={name}
+              className="h-full w-full"
+              width={0}
+              height={0}
+              sizes="100vw"
+              priority={true}
+            /> 
+          ) : (
+            <NameOneLetter>{nameFirstLetter}</NameOneLetter>
+          )}
+          </UserAvatarContainer>
 
           <Content>
   
-            <UserName>Владислав</UserName>
-            <UserEmail>example@gmail.com</UserEmail>
+            <UserName>{name}</UserName>
+            <UserProviderStamp>{providerStamp}</UserProviderStamp>
 
-            <EditButtonInContent onClick={() => setIsModalOpen(!isModalOpen)}>
+            {isAuthenticated && (
+              <EditButtonInContent onClick={() => setIsModalOpen(!isModalOpen)}>
               <SvgContainer><EditIcon /></SvgContainer>
               <span>Редактировать</span>
-            </EditButtonInContent>
+              </EditButtonInContent>
+            )}
 
             <UserAbout>
-              Рыбатекст используется дизайнерами, проектировщиками и фронтендерами,
-              когда нужно быстро заполнить макеты или прототипы содержимым.
-              Это тестовый контент, который не должен нести никакого смысла,
-              лишь показать наличие самого текста или продемонстрировать типографику в деле.
+              {about}
             </UserAbout>
 
-            <LogoutButton>
-              <SvgContainer>
-                <LogoutIcon />
-              </SvgContainer>
-              <span>Выйти</span>
-            </LogoutButton>
+            {isAuthenticated && (
+              <LogoutButton onClick={() => signOut()}>
+                <SvgContainer>
+                  <LogoutIcon />
+                </SvgContainer>
+                <span>Выйти</span>
+              </LogoutButton>
+            )}
           </Content>
 
           <Aside>
+          {isAuthenticated && (
             <EditButtonInAside onClick={() => setIsModalOpen(!isModalOpen)}>
               <SvgContainer>
                 <EditIcon />
               </SvgContainer>
               <span>Редактировать</span>
             </EditButtonInAside>
+          )}  
           </Aside>
 
         </InfoLimiter>
@@ -162,10 +208,16 @@ const SvgContainer = tw.span`
   w-[25px] h-[25px] px-[2px] py-[2px]
 `;
 
-const UserAvatar = tw.span`
-  absolute w-[100px] h-[100px] -top-[50px] left-0 pt-[22px]
+const UserAvatarContainer = tw.div`
+  absolute w-[100px] h-[100px] -top-[50px] left-0
   flex justify-center 
-  text-[36px] rounded-full border border-[#E6E6E6] bg-[#F3F3F3] 
+  rounded-full border border-[#E6E6E6] bg-[#F3F3F3]
+  overflow-hidden 
+`;
+
+const NameOneLetter = tw.div`
+  pt-[22px] mx-auto
+  text-[36px]
 `;
 
 const UserName = tw.h1`
@@ -182,7 +234,7 @@ const EditButtonInAside = tw(ButtonNormal)`
   hidden md:flex
 `;
 
-const UserEmail = tw.p`
+const UserProviderStamp = tw.p`
   text-[#838383]
 `;
 

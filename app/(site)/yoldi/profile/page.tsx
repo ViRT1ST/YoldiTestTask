@@ -1,12 +1,9 @@
-import Profile from '@/components/yoldi/Profile';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Yoldi Profile Page',
+  title: 'Main Page',
 };
 
-export default function ProfilePage() {
-  return (
-    <Profile />
-  );
+export default function MainPage() {
+  redirect('/yoldi/profile/me');
 }
-

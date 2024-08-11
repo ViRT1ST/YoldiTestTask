@@ -1,15 +1,14 @@
 import Cookies, { CookieSetOptions } from 'universal-cookie';
 
 const daysToExpiration = 89;
+const millisecondsToExpiration = daysToExpiration * 24 * 60 * 60 * 1000;
 
-function createCookieOptions() {
-  const options: CookieSetOptions = {
+function getCookieOptions() {
+  return {
     path: '/',
     sameSite: 'lax',
-    expires: new Date(Date.now() + daysToExpiration * 24 * 60 * 60 * 1000)
-  };
-
-  return options;
+    expires: new Date(Date.now() + millisecondsToExpiration)
+  } as CookieSetOptions;
 }
 
 function getCookies() {
@@ -20,7 +19,7 @@ function createCookies(obj: object) {
   const cookies = new Cookies();
 
   Object.entries(obj).forEach(([key, value]) => {
-    const cookieOptions = createCookieOptions();
+    const cookieOptions = getCookieOptions();
     cookies.set(key, value, cookieOptions);
   });
 }

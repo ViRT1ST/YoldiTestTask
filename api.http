@@ -3,8 +3,6 @@
 # ================================================
 
 @nextApiUrl = http://localhost:7733/api
-@nextApiUser = jennifer@gmail.com
-@nextApiPassword = password123!
 
 ### ==============================================
 # User | Create account by email:pass
@@ -13,8 +11,9 @@
 POST {{nextApiUrl}}/users
 Content-Type: application/json
 {
-  "email": "grogu@gmail.com",
-  "password": "password123!"
+  "email": "mando@gmail.com",
+  "password": "password123!",
+  "username": "Mandolorian"
 }
 
 ### ==============================================
@@ -29,28 +28,16 @@ Content-Type: application/json
 }
 
 ### ==============================================
-# User | Logout (delete current token)
+# User | Get info
 # ================================================
 
-POST {{nextApiUrl}}/users/logout
+
+GET {{nextApiUrl}}/users/me
 Content-Type: application/json
-Authorization: Bearer TOKEN
+Cookie: authjs.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiVjVIOVJVaWNRekZmel9tTG53MWRIdkQ4VEZHSUVwMVh4eExTR0hUNDlySm50MDlPWER1QUx1RWk5LXFaN1FjYmg1UHhkdlFzYTVKcHl5Ymh3QmM4cncifQ..Ij0Jwjg0SNVThbaYQBll2Q.x8xQG0GDR24d-30v60Yvn0PS8xB83ALxvq9e6Wjd09wWdYv5A_UFj50VWfB2nyWJNWpM1NNDnDf36AJ-SIFcfQYhO-FPYDqJuAGiXR7xkOp5P5zjfWsBtcYus7B9sKjxOySqun5jJgRjUFlfdmNM0EeQwhahnZA1UF3P7F7gYxUdAwNNho7oIdAzfKl5pVX4UJlEmXIQIq1WzDiyKOegTtUL_1Q_73ihE1jLEZ8KCH4.x4vC7VU7AqWl-bCpZgsF_zNFZxH8UMPdDJgqM2KCW8A
+#Authorization: Bearer eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiVjVIOVJVaWNRekZmel9tTG53MWRIdkQ4VEZHSUVwMVh4eExTR0hUNDlySm50MDlPWER1QUx1RWk5LXFaN1FjYmg1UHhkdlFzYTVKcHl5Ymh3QmM4cncifQ..YvAhcAXk33nSk5yM_wLegA.G4hi9yUKMptH42H-rDgWs2zLbzrTPCnY5Acb9p1siEBdrcL5vFMlZabA9SUdd2JX5vQgCP6XMJ5OX4omS6VxRepzmJwHNnQE06s3A7VdmBR99muzVuDhO8C9GEKQMHmY5eNHB9eB5m_32GiYcgnM3dFkXpkulQNWLGab5FFI_dSNYm68ld_ualUes0WzemlGzfI3mfre6gY1PUctgQQyBmiR7HrMP9UDB_qDWOSrTbQ.Pv2brSg6PkdgEavd8au3KM22gMOeSLjzcfWAnk0v1Us 
 
-### ==============================================
-# User | Logout (delete all tokens)
-# ================================================
 
-POST {{nextApiUrl}}/users/logout-all
-Content-Type: application/json
-Authorization: Bearer TOKEN
-
-### ==============================================
-# User | Delete
-# ================================================
-
-DELETE {{nextApiUrl}}/users/me
-Content-Type: application/json
-Authorization: Bearer TOKEN
 
 ### ==============================================
 # User | Change data
@@ -58,96 +45,12 @@ Authorization: Bearer TOKEN
 
 PATCH {{nextApiUrl}}/users/me
 Content-Type: application/json
-Authorization: Bearer TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzVmZGVlYWQtYmM3Zi00NTVmLTgyZGYtZGE0NWQzOWRjZDdhIiwiZXhwIjoxNzIwNzcwNDA3LCJpYXQiOjE3MTI5OTQ0MDd9.Ebj0r0CFWCHqzmnc07Tk2HN4wo1ALNDgq_ImDbrDRWs
 {
-  "new_email": "JohnWoo@gmail.com",
+  "new_email": "john@gmail.com",
   "new_password": "password123!",
   "new_subscriptions": ["ea12cd10-be78-49f6-b10a-0e1640b8e40f", "9d0aee7c-9bb9-450c-b073-28c91289ec8a"]
 }
 
-### ==============================================
-# User | Get info
-# ================================================
 
-GET {{nextApiUrl}}/users/me
-Content-Type: application/json
-Authorization: Bearer TOKEN
 
-### ==============================================
-# Articles | Get unreaded
-# ================================================
-
-GET {{nextApiUrl}}/articles?find=unreaded
-Content-Type: application/json
-Authorization: Bearer TOKEN
-
-### ==============================================
-# Articles | Get saved
-# ================================================
-
-GET {{nextApiUrl}}/articles?find=saved
-Content-Type: application/json
-Authorization: Bearer TOKEN
-### ==============================================
-# Articles | Save it for user
-# ================================================
-
-PATCH {{nextApiUrl}}/articles/29be4f26-a61e-497b-96d9-50fd29e93a50/save
-Content-Type: application/json
-Authorization: Bearer TOKEN
-
-### ==============================================
-# Articles | Hide if from user 
-# ================================================
-
-PATCH {{nextApiUrl}}/articles/29be4f26-a61e-497b-96d9-50fd29e93a50/hide
-Content-Type: application/json
-Authorization: Bearer TOKEN
-
-### ==============================================
-# Articles | Create (only for spider) 
-# ================================================
-
-POST {{nextApiUrl}}/articles
-Content-Type: application/json
-Authorization: Bearer TOKEN
-[
-  {
-    "url": "https://wccftech.com/helldivers-2-is-outselling-spider-man-2-in-the-united-kingdom/",
-    "title": "Helldivers 2 Is Outselling Spider-Man 2 in the United Kingdom",
-    "site": "Wccftech",
-    "section": "News",
-    "source_uuid": "9d0aee7c-9bb9-450c-b073-28c91289ec8a"
-  },
-    {
-    "url": "https://wccftech.com/real-life-pixel-8a-pictures-show-thick-bezels-and-a-rounded-design/",
-    "title": "Real-Life Pixel 8a Pictures Show Thick Bezels And A Rounded Design",
-    "site": "Wccftech",
-    "section": "News",
-    "source_uuid": "9d0aee7c-9bb9-450c-b073-28c91289ec8a"
-  }
-]
-
-### ==============================================
-# Articles | Get all urls (only for spider) 
-# ================================================
-
-GET {{nextApiUrl}}/articles/urls
-Content-Type: application/json
-Authorization: Bearer TOKEN
-
-### ==============================================
-# Articles | Delete old articles (only for spider) 
-# ================================================
-
-DELETE {{nextApiUrl}}/articles?months=1
-Content-Type: application/json
-Authorization: Bearer TOKEN
-
-### ==============================================
-# Sources | Get list (only for spider) 
-# ================================================
-
-GET {{nextApiUrl}}/sources
-Content-Type: application/json
-Authorization: Bearer TOKEN

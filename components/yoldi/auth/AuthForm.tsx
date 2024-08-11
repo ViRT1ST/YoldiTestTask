@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { toast } from 'react-toastify';
 import tw from 'tailwind-styled-components';
 import clsx from 'clsx';
 
@@ -11,77 +11,84 @@ import {
   EmailIcon,
   PasswordIcon,
   PasswordVisibilityIcon
-} from '@/components/yoldi/Icons';
+} from '@/components/yoldi/ui/Icons';
 
-import { REGISTRATION_PAGE_STRING, LOGIN_PAGE_STRING, ROOT_PATH } from '@/lib/constants';
-import ButtonLarge from '@/components/yoldi/ButtonLarge';
+import {
+  REGISTRATION_PAGE_STRING,
+  LOGIN_PAGE_STRING,
+} from '@/lib/constants';
+
+import ButtonThirdParty from '@/components/yoldi/auth/ButtonThirdParty';
+import ButtonCredentials from '@/components/yoldi/auth/ButtonCredentials';
 
 const constants = {
   [REGISTRATION_PAGE_STRING]: {
     formTitle: 'Регистрация\nв Yoldi Agency',
     submitButtonText: 'Создать аккаунт',
+    submitButtonTooltip: 'Создать аккаунт используя почту и пароль',
   },
   [LOGIN_PAGE_STRING]: {
     formTitle: 'Вход в Yoldi Agency',
     submitButtonText: 'Войти',
+    submitButtonTooltip: 'Войти в аккаунт используя почту и пароль',
   },
   defaultStates: {
-    name: 'Владислав',
-    email: 'example@gmail.com',
-    password: '0123456789',
-    passwordInputType: 'password',
+    name: 'Владислав', //'Владислав',
+    email: 'example@gmail.com', //'example@gmail.com',
+    password: 'password123!', // 'password123!',
   },
-  afterAuthRedirect: `${ROOT_PATH}/yoldi/profile`
 };
 
 export default function AuthForm() {
   const searchParams = useSearchParams();
   const isRegistrationPage = searchParams.get('method') === REGISTRATION_PAGE_STRING;
-  const redirect = searchParams.get('callbackUrl') || 'http://localhost:3000';
+  const errorMessage = searchParams.get('error');
 
   const pageData = isRegistrationPage
     ? constants[REGISTRATION_PAGE_STRING]
     : constants[LOGIN_PAGE_STRING];
 
   const defaults = constants.defaultStates;
-  const [name, setName] = useState(defaults.name);
+  const [username, setUsername] = useState(defaults.name);
   const [email, setEmail] = useState(defaults.email);
   const [password, setPassword] = useState(defaults.password);
-  const [passwordInputType, setPasswordInputType] = useState(defaults.passwordInputType);
+  const [passwordInputType, setPasswordInputType] = useState('password');
 
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const passwordInputRef = useRef<HTMLInputElement>(null);
-  
-  const isFieldsFilledForRegistration = Boolean(name) && Boolean(email) && Boolean(password);
-  const isFieldsFilledForLogin = Boolean(email) && Boolean(password);
+
+  const isPasswordEmpty = password == '';
+
+  const isFieldsFilledForRegistration = !!username && !!email && !!password;
+  const isFieldsFilledForLogin = !!email && !!password;
 
   const isFieldsFilled = isRegistrationPage
     ? isFieldsFilledForRegistration
     : isFieldsFilledForLogin;
 
-  const isPasswordEmpty = password == '';
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+  }, [errorMessage]);
 
   useEffect(() => {
+    // setUsername('');
+    // setEmail('');
+    // setPassword('');
+    
     isRegistrationPage
       ? nameInputRef.current?.focus()
       : emailInputRef.current?.focus();
   }, [isRegistrationPage]);
 
   const switchPasswordVisibility = () => {
-    const newType = passwordInputType === 'password' ? 'text' : 'password';
-    setPasswordInputType(newType);
+    setPasswordInputType(passwordInputType === 'password' ? 'text' : 'password');
   };
 
   const formSubmitHandler = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    await signIn('credentials', {
-      username: email,
-      password: password,
-      redirect: true,
-      callbackUrl: redirect
-    });
+    console.log('form submit');    
   };
 
   return (
@@ -96,8 +103,8 @@ export default function AuthForm() {
               type="text"
               name="user_name"
               placeholder="Имя"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
     
             <SvgContainer className="top-[15.5px] left-[24px]">
@@ -123,7 +130,6 @@ export default function AuthForm() {
 
         <InputFieldContainer>
           <InputField
-            ref={passwordInputRef}
             className="pr-14"
             type={passwordInputType}
             name="user_password"
@@ -148,13 +154,28 @@ export default function AuthForm() {
         </InputFieldContainer>
       </AllInputFieldsContainer>
 
-      <SubmitButton
-        className={clsx(!isFieldsFilled && 'bg-[#d4d4d4] text-[#f3f3f3]')}
-        disabled={!isFieldsFilled}
-        type="submit"
-      >
-        {pageData.submitButtonText}
-      </SubmitButton>
+      <ButtonCredentials
+        label={pageData.submitButtonText}
+        tooltip={pageData.submitButtonTooltip}
+        isFieldsFilled={isFieldsFilled}
+        credentials={{
+          name: username,
+          email: email,
+          password: password,
+          isRegistrationPage: isRegistrationPage,
+        }}
+      />
+
+      <SocialAuthHintContainer>
+        <SocialAuthHintLine />
+        <SocialAuthHintText>ИЛИ ВОЙТИ ЧЕРЕЗ СОЦИАЛЬНУЮ СЕТЬ</SocialAuthHintText>
+        <SocialAuthHintLine />
+      </SocialAuthHintContainer>
+
+      <SocialAuthButtonsContainer>
+        <ButtonThirdParty label="Google" provider="google" />
+        <ButtonThirdParty label="GitHub" provider="github" />
+      </SocialAuthButtonsContainer>
     </Form>
   );
 }
@@ -176,6 +197,7 @@ const Title = tw.h1`
 `;
 
 const AllInputFieldsContainer = tw.div`
+  mb-[10px]
   px-0 xs:px-[5px] 
 `;
 
@@ -194,6 +216,24 @@ const SvgContainer = tw.span`
   absolute w-[25px] h-[25px]
 `;
 
-const SubmitButton = tw(ButtonLarge)`
-  mt-[10px]
+const SocialAuthHintContainer = tw.div`
+  w-full my-5 
+  flex items-center justify-center
 `;
+
+const SocialAuthHintLine = tw.div`
+  flex-grow
+  border-t border-[#D4D4D4]
+  hidden xs:block
+`;
+
+const SocialAuthHintText = tw.div`
+  w-auto mx-4
+  flex-grow-0
+  text-xs text-[#838383] text-center 
+`;
+
+const SocialAuthButtonsContainer = tw.div`
+  flex flex-row gap-[10px]
+`;
+

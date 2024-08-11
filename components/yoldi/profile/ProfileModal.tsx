@@ -1,32 +1,37 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState,useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import tw from 'tailwind-styled-components';
 
-import ButtonLarge from '@/components/yoldi/ButtonLarge';
+import ButtonLarge from '@/components/yoldi/ui/ButtonLarge';
 
 export default function ProfileModal({
-  isOpen,
-  close
+  isOpen, data, onSaveData, close
 }: {
   isOpen: boolean;
-  close: () => void
+  data: any;
+  onSaveData: (data: any) => void;
+  close: () => void;
 }) {
-  const defaultText = `Рыбатекст используется дизайнерами, проектировщиками и фронтендерами, когда нужно быстро заполнить макеты или прототипы содержимым. Это тестовый контент, который не должен нести никакого смысла, лишь показать наличие самого текста или продемонстрировать типографику в деле.`;
+  const { name, profileUrl, about } = data;
+  
+  const [nameText, setNameText] = useState(name);
+  const [idForUrlText, setIdForUrlText] = useState(profileUrl);
+  const [aboutText, setAboutText] = useState(about);
 
   useEffect(() => {
-    const closeOnEscapeKey = (e: KeyboardEvent) => {
+    const closeOnEscKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         close();
       }
     };
 
     document.body.style.overflow = isOpen ? 'hidden' : '';
-    document.body.addEventListener('keydown', closeOnEscapeKey);
+    document.body.addEventListener('keydown', closeOnEscKey);
 
     return () => {
-      document.body.removeEventListener('keydown', closeOnEscapeKey);
+      document.body.removeEventListener('keydown', closeOnEscKey);
     };
   }, [isOpen]);
 
@@ -34,32 +39,51 @@ export default function ProfileModal({
   if (!isOpen) {
     return null;
   }
+
+  const handleFormSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    close();
+    onSaveData({
+      name: nameText,
+      idForUrl: idForUrlText,
+      about: aboutText
+    });
+  };
   
   const modal = (
     <Modal>
-      <EditInfoForm onSubmit={(e) => e.preventDefault()}>
+      <EditInfoForm onSubmit={handleFormSubmit}>
 
         <FlexContainer>
           <EditInfoTitle>Редактировать профиль</EditInfoTitle>
 
           <EditInfoLabel>Имя</EditInfoLabel>
-          <EditInfoInputField defaultValue="Владислав" />
+          <EditInfoInputField
+            value={nameText}
+            onChange={(e) => setNameText(e.target.value)}
+          />
 
           <EditInfoLabel>Адрес профиля</EditInfoLabel>
           <ProfileUrlContainer>
             <ProfileUrlLeft>example.com/</ProfileUrlLeft>
-            <ProfileUrlRight defaultValue="romanov" />
+            <ProfileUrlRight
+              value={idForUrlText}
+              onChange={(e) => setIdForUrlText(e.target.value)}
+            />
           </ProfileUrlContainer>
         </FlexContainer>
 
         <FlexContainer className="flex-grow">
           <EditInfoLabel>Описание</EditInfoLabel>
-          <EditInfoTextArea defaultValue={defaultText} />
+          <EditInfoTextArea
+            value={aboutText}
+            onChange={(e) => setAboutText(e.target.value)}
+          />
         </FlexContainer>
         
         <FlexContainer className="flex flex-row gap-[10px]">
-          <CancelButton light={true} onClick={close}>Отмена</CancelButton>
-          <SaveButton>Сохранить</SaveButton>
+          <CancelButton type="button" light={true} onClick={close}>Отмена</CancelButton>
+          <SaveButton type="submit">Сохранить</SaveButton>
         </FlexContainer>
 
       </EditInfoForm>

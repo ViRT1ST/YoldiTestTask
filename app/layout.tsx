@@ -1,5 +1,7 @@
 import { Open_Sans, Lato, Roboto, Inter } from 'next/font/google';
+import { ToastContainer } from 'react-toastify';
 
+import 'react-toastify/dist/ReactToastify.css';
 import '@/assets/styles/globals.css';
 
 const open_sans = Open_Sans({
@@ -34,6 +36,10 @@ export const metadata = {
   title: 'News Collector 6.0',
 };
 
+const toastConfig = {
+  autoClose: 3000
+};
+
 export default function RootLayout({ children } : { children: React.ReactNode }) {
   return (
     <html
@@ -42,6 +48,7 @@ export default function RootLayout({ children } : { children: React.ReactNode })
     >
       <body className="relative">
         {children}
+        <ToastContainer { ...toastConfig } />
         <div id="modal-container" className="absolute top-0 left-0 w-full" />
       </body>
     </html>

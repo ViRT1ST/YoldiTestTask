@@ -1,21 +1,17 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
-export const config = {
-  matcher: [
-    '/yoldi/profile',
-  ],
-};
-
-export default auth((req) => {
-  const session = req.auth;
+export default async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname;
+  const session = !!req.cookies.get('authjs.session-token');
 
   if (!session) {
-    const reqUrl = req.url;
-    const reqUrlEncoded = encodeURIComponent(req.url);
-
-    const redirectUrl = `auth?callbackUrl=${reqUrlEncoded}`;
-
-    return NextResponse.redirect(new URL(redirectUrl, reqUrl));
+    return NextResponse.redirect(new URL(`/api/auth/signin?callbackUrl=${path}`, req.url));
   }
-});
+  
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/yoldi/profile/me']
+};
+

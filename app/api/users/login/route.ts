@@ -1,11 +1,12 @@
 import { successResponse, errorResponse } from '@/lib/backend/responses';
+import bcrypt from '@/lib/backend/utils/bcrypt';
 import validator from '@/lib/backend/validator';
 import pg from '@/lib/backend/postgres';
 
 export const dynamic = 'force-dynamic';
 
 /* =============================================================
-Endpoint     : POST /api/users/
+Endpoint     : POST /api/users/login
 Query Params : none
 Headers:     : none
 Body         : { email, password }
@@ -13,22 +14,27 @@ Body         : { email, password }
 
 export const POST = async (req: Request) => {
   try {
-    const { email, password, username } = await req.json();
+    const { email, password } = await req.json();
 
     const validEmail = validator.assertEmail(email);
     const validPassword = validator.assertPassword(password);
-    const validUsername = validator.assertString(username);
 
-    await pg.createUserByAuthEmail(validEmail, validPassword, validUsername);
     const user = await pg.getUserByAuthEmail(validEmail);
+    console.log('api user', user);
 
-    // const data = {
-    //   uuid: user.uuid,
-    //   email: user.email,
-    //   username: user.username,
-    // };
+    if (!user) {
+      throw new Error('User not found');
+    }
 
-    return successResponse(200, { OK: true });
+    await bcrypt.checkPassword(validPassword, user.password);
+
+    const data = {
+      uuid: user.uuid,
+      // credentials_email: user.email,
+      name: user.profile_name,
+    };
+
+    return successResponse(200, data);
 
   } catch (error) {
     return errorResponse(error);

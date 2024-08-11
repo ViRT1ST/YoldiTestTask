@@ -2,12 +2,10 @@ import { headers } from 'next/headers';
 
 export default async function WhoAmIRSC() {
   
-  const { user } = await fetch('http://localhost:3000/api/whoami', {
+  const { user } = await fetch('http://localhost:3000/api/debug', {
     method: 'GET',
     headers: headers(),
   },).then((res) => res.json());
 
-  console.log('xxxxxry');
-
-  return <div className="mt-5">Who Am I (RSC): {user.name} </div>;
+  return <div>Who Am I (RSC): {user?.name || user?.profile_name} </div>;
 }

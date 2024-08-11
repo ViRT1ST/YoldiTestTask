@@ -2,14 +2,12 @@
 
 import { Provider } from 'react-redux';
 import { useEffect, useState, ReactNode } from 'react';
+
 import tw from 'tailwind-styled-components';
 
-import Header from '@/components/yoldi/Header';
-import Footer from '@/components/yoldi/Footer';
+import Header from '@/components/yoldi/layout/Header';
+import Footer from '@/components/yoldi/layout/Footer';
 import store from '@/lib/frontend/store';
-
-import SessionProvider from '@/components/SessionProvider';
-
 
 export default function ContentLayout({ children }: { children: ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
@@ -23,15 +21,13 @@ export default function ContentLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <SessionProvider>
-      <Provider store={store}>
-        <LayoutContainer>
-          <Header />
-          <Content>{children}</Content>
-          <Footer />
-        </LayoutContainer>
-      </Provider>
-    </SessionProvider>
+    <Provider store={store}>
+      <LayoutContainer>
+        <Header />
+        <Content>{children}</Content>
+        <Footer />
+      </LayoutContainer>
+    </Provider>
   );
 }
 

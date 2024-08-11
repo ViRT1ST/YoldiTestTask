@@ -1,9 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
 import { Pool } from 'pg';
+import bcrypt from 'bcryptjs';
 
-import { DbUser, UserUpdateData } from '@/lib/types';
-// import bcrypt from '@/lib/backend/utils/bcrypt';
-import validator from '@/lib/backend/validator';
+import { AnyFieldsObject, OauthProviders } from '@/lib/types';
 
 const pool = new Pool({
   host: process.env.PG_HOST,
@@ -13,55 +11,121 @@ const pool = new Pool({
   database: process.env.PG_DATABASE,
 });
 
-async function checkEmailIsNotExist(email: string): Promise<void | never> {
-  const query = `
-    SELECT email_lowercase
-    FROM users
-    WHERE email_lowercase = LOWER($1)
-    LIMIT 1
-  `;
+/* =============================================================
+All users
+============================================================= */
 
-  const { rows } = await pool.query(query, [email]);
+async function getUserByUuid(
+  uuid: string
+): Promise<AnyFieldsObject | undefined> {
 
-  if (rows[0]) {
-    validator.throwError(400, 'This email is already associated with an account.');
-  }
-}
-
-
-async function createUser(email: string, password: string, username: string):
-  Promise<void | never> {
-  
-  // await checkEmailIsNotExist(email);
-
-  // const uuid = uuidv4();
-  // const hashedPassword = await bcrypt.hashPassword(password);
-
-  // const query = `
-  //   INSERT INTO users (uuid, email, email_lowercase, username, password)
-  //   VALUES ($1, $2, LOWER($2), $3, $4)
-  // `;
-  
-  // await pool.query(query, [uuid, email, username, hashedPassword]);
-}
-
-async function getUserByEmail(email: string): Promise<DbUser | never> {
   const query = `
     SELECT *
     FROM users
-    WHERE email_lowercase = LOWER($1)
+    WHERE uuid = $1
+    LIMIT 1
+  `;
+
+  const { rows } = await pool.query(query, [uuid]);
+
+  return rows[0];
+}
+
+async function getUserByProfileUrl(
+  profileUrl: string
+): Promise<AnyFieldsObject | undefined> {
+
+  const query = `
+    SELECT *
+    FROM users
+    WHERE profile_url_default = $1 OR profile_url_custom = $1
+    LIMIT 1
+  `;
+
+  const { rows } = await pool.query(query, [profileUrl]);
+
+  return rows[0];
+}
+
+/* =============================================================
+Users with authentication by email and password
+============================================================= */
+
+async function getUserByAuthEmail(
+  email: string
+): Promise<AnyFieldsObject | undefined | never> {
+
+  const query = `
+    SELECT *
+    FROM users
+    WHERE LOWER(credentials_email) = LOWER($1)
     LIMIT 1
   `;
 
   const { rows } = await pool.query(query, [email]);
-  const user = validator.assertUser(rows[0]);
 
-  return user;
+  return rows[0];
 }
 
+async function createUserByAuthEmail(
+  email: string, password: string, profileName: string = 'Anonymous'
+): Promise<AnyFieldsObject | undefined | never> {
+  
+  const hashedPassword = await bcrypt.hash(password, 8);
 
-async function updateUser(data: UserUpdateData): Promise<void> {
-  const { uuid, new_email, new_username, new_password } = data;
+  const query = `
+    INSERT INTO users (default_provider, credentials_email, credentials_password, profile_name)
+    VALUES ('credentials', $1, $2, $3)
+    RETURNING *
+  `;
+  
+  const { rows } = await pool.query(query, [email, hashedPassword, profileName]);
+
+  return rows[0];
+}
+
+/* =============================================================
+Users with authentication by third party auth providers
+============================================================= */
+
+async function getUserByAuthId(
+  provider: OauthProviders, id: string
+): Promise<AnyFieldsObject | undefined | never> {
+
+  const query = `
+    SELECT *
+    FROM users
+    WHERE ${provider}_id = ($1)::TEXT
+    LIMIT 1
+  `;
+
+  const { rows } = await pool.query(query, [id]);
+
+  return rows[0];
+}
+
+async function createUserByAuthId(
+  provider: OauthProviders, id: string, name: string = 'Anonymous', avatar: string
+): Promise<AnyFieldsObject | undefined | never> {
+  
+  const query = `
+    INSERT INTO users (default_provider, ${provider}_id, profile_name, profile_avatar)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *
+  `;
+  
+  const { rows } = await pool.query(query, [provider, id, name, avatar]);
+  return rows[0];
+}
+
+/* =============================================================
+Update profile info
+============================================================= */
+
+async function updateProfile(
+  data: any
+): Promise<AnyFieldsObject | undefined | never> {
+  const { uuid, name, about, idForUrl } = data;
 
   const paramsForSet: string[] = [];
   const paramsToPass: any[] = [uuid];
@@ -71,10 +135,13 @@ async function updateUser(data: UserUpdateData): Promise<void> {
     paramsToPass.push(value);
   };
 
-  new_email && addParam('email', new_email);
-  new_email && addParam('email_lowercase', new_email.toLowerCase());
-  new_username && addParam('username', new_username);
-  // new_password && addParam('password', await bcrypt.hashPassword(new_password));
+  name && addParam('profile_name', name);
+  about && addParam('profile_about', about);
+  idForUrl && addParam('profile_url_custom', idForUrl);
+
+  if (paramsToPass.length < 2) {
+    return;
+  }
 
   const query = `
     UPDATE users
@@ -82,14 +149,19 @@ async function updateUser(data: UserUpdateData): Promise<void> {
     WHERE uuid = $1
   `;
 
-  await pool.query(query, paramsToPass);
+  const { rows } = await pool.query(query, paramsToPass);
+
+  return rows[0];
 }
 
 export default {
-  createUser,
-  getUserByEmail,
-  checkEmailIsNotExist,
-  updateUser,
+  getUserByUuid,
+  getUserByProfileUrl,
+  getUserByAuthEmail,
+  createUserByAuthEmail,
+  getUserByAuthId,
+  createUserByAuthId,
+  updateProfile
 };
 
 
