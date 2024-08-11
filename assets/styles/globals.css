@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .min-h-screen-svh {
+        min-height: 100vh; /* fallback for Opera, IE and etc. */
+        min-height: 100svh;
+    }
+}

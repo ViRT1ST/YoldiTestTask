@@ -1,0 +1,153 @@
+# ================================================
+# Variables
+# ================================================
+
+@nextApiUrl = http://localhost:7733/api
+@nextApiUser = jennifer@gmail.com
+@nextApiPassword = password123!
+
+### ==============================================
+# User | Create account by email:pass
+# ================================================
+
+POST {{nextApiUrl}}/users
+Content-Type: application/json
+{
+  "email": "grogu@gmail.com",
+  "password": "password123!"
+}
+
+### ==============================================
+# User | Login by email:pass
+# ================================================
+
+POST {{nextApiUrl}}/users/login
+Content-Type: application/json
+{
+  "email": "grogu@gmail.com",
+  "password": "password123!"
+}
+
+### ==============================================
+# User | Logout (delete current token)
+# ================================================
+
+POST {{nextApiUrl}}/users/logout
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# User | Logout (delete all tokens)
+# ================================================
+
+POST {{nextApiUrl}}/users/logout-all
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# User | Delete
+# ================================================
+
+DELETE {{nextApiUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# User | Change data
+# ================================================
+
+PATCH {{nextApiUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer TOKEN
+{
+  "new_email": "JohnWoo@gmail.com",
+  "new_password": "password123!",
+  "new_subscriptions": ["ea12cd10-be78-49f6-b10a-0e1640b8e40f", "9d0aee7c-9bb9-450c-b073-28c91289ec8a"]
+}
+
+### ==============================================
+# User | Get info
+# ================================================
+
+GET {{nextApiUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# Articles | Get unreaded
+# ================================================
+
+GET {{nextApiUrl}}/articles?find=unreaded
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# Articles | Get saved
+# ================================================
+
+GET {{nextApiUrl}}/articles?find=saved
+Content-Type: application/json
+Authorization: Bearer TOKEN
+### ==============================================
+# Articles | Save it for user
+# ================================================
+
+PATCH {{nextApiUrl}}/articles/29be4f26-a61e-497b-96d9-50fd29e93a50/save
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# Articles | Hide if from user 
+# ================================================
+
+PATCH {{nextApiUrl}}/articles/29be4f26-a61e-497b-96d9-50fd29e93a50/hide
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# Articles | Create (only for spider) 
+# ================================================
+
+POST {{nextApiUrl}}/articles
+Content-Type: application/json
+Authorization: Bearer TOKEN
+[
+  {
+    "url": "https://wccftech.com/helldivers-2-is-outselling-spider-man-2-in-the-united-kingdom/",
+    "title": "Helldivers 2 Is Outselling Spider-Man 2 in the United Kingdom",
+    "site": "Wccftech",
+    "section": "News",
+    "source_uuid": "9d0aee7c-9bb9-450c-b073-28c91289ec8a"
+  },
+    {
+    "url": "https://wccftech.com/real-life-pixel-8a-pictures-show-thick-bezels-and-a-rounded-design/",
+    "title": "Real-Life Pixel 8a Pictures Show Thick Bezels And A Rounded Design",
+    "site": "Wccftech",
+    "section": "News",
+    "source_uuid": "9d0aee7c-9bb9-450c-b073-28c91289ec8a"
+  }
+]
+
+### ==============================================
+# Articles | Get all urls (only for spider) 
+# ================================================
+
+GET {{nextApiUrl}}/articles/urls
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# Articles | Delete old articles (only for spider) 
+# ================================================
+
+DELETE {{nextApiUrl}}/articles?months=1
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+### ==============================================
+# Sources | Get list (only for spider) 
+# ================================================
+
+GET {{nextApiUrl}}/sources
+Content-Type: application/json
+Authorization: Bearer TOKEN
