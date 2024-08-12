@@ -50,8 +50,13 @@ export type userWithExtraData = User & ({
     name?: string;
     email?: string;
     password?: string;
-    // callbackUrl?: string;
+    callbackUrl?: string;
     formUrl?: string;
+    sub: string,
+    picture: string;
+    login: string;
+    id: number;
+    avatar_url: string;
   }
   iss?: string
 }) | undefined;

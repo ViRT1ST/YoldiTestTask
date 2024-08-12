@@ -38,7 +38,7 @@ const defaultInputValues = {
 export default function AuthForm() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const router = useRouter()
+  const router = useRouter();
 
   const urlMethod = searchParams.get('method');
   const urlErrorMessage = searchParams.get('error');
@@ -76,9 +76,9 @@ export default function AuthForm() {
       router.push(`?method=${urlMethod}`);
       toast.error(urlErrorMessage);
     }
-    // setTimeout(() => {
-    //   setErrorMsg(null);
-    // }, 10000);
+    setTimeout(() => {
+      setErrorMsg(null);
+    }, 10000);
   }, [urlErrorMessage]);
 
   useEffect(() => {
@@ -86,7 +86,6 @@ export default function AuthForm() {
       ? nameInputRef.current?.focus()
       : emailInputRef.current?.focus();
   }, [isRegistrationPage]);
-
 
   // delete later
   // useEffect(() => {
@@ -160,20 +159,14 @@ export default function AuthForm() {
           </InputFieldContainer>
 
           {errorMsg && (
-          
-          <div className="flex flex-col px-2 py-2 rounded-[5px] justify-center
-            text-black w-full   bg-red-50
-          border-red-600 border mb-4">
-            <p className="text-red-600">Authentification error</p>
-            <ul >
-              {errorMsg.split(' | ').map((error) => (
-                <li>
-                * {error}
-                </li>
-              ))}
-
-            </ul>
-          </div>
+            <ErrorContainer>
+              <p className="text-red-600">Authentification error</p>
+              <ul >
+                {errorMsg.split(' | ').map((error) => (
+                  <li key={error}>* {error}</li>
+                ))}
+              </ul>
+            </ErrorContainer>
           )}
 
         </AllInputFieldsContainer>
@@ -287,3 +280,7 @@ const SocialAuthButtonsContainer = tw.div`
   flex flex-row gap-[10px]
 `;
 
+const ErrorContainer = tw.div`
+  w-full px-2 py-2 mb-4 flex flex-col justify-center
+  text-black bg-red-50 rounded-[5px]
+`;

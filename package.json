@@ -1,6 +1,6 @@
 {
-  "name": "potfolio-server-nextjs-v0.0.3",
-  "version": "0.0.3",
+  "name": "potfolio-server-nextjs-v3",
+  "version": "3.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",

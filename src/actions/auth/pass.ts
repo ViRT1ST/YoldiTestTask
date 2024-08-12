@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
-
 import { auth, signOut, unstable_update} from '@/lib/auth/next-auth';
 import validator from '@/lib/backend/validator';
 import pg from '@/lib/backend/postgres';
@@ -23,8 +22,10 @@ export async function authorizeUser() {
   }
 
   const authProvider = sessionUser?.iss;
-  let authError: any = null;
+
   let isRegistrationPage = false;
+  let authError: any = null;
+  let dbUser: any = null;
 
   /* =============================================================
   Credentials authorization passing
@@ -40,25 +41,60 @@ export async function authorizeUser() {
 
       // Registration form
       if (isRegistrationPage) {
-        if (!name || !email || !password) {
-          validator.throwError(400, 'Invalid registration data provided');
-          // TODO: ^zod
+        const registrationSchema = z.object({
+          name: z
+            .string()
+            .min(3, { message: 'Name must be at least 5 characters'}),
+          email: z
+            .string()
+            .email({ message: 'Valid email is required'})
+            .min(5, { message: 'Email must be at least 5 characters'}),
+          password: z
+            .string()
+            .min(8, { message: 'Password must be at least 8 characters'})
+        });
 
+        const result = registrationSchema.safeParse({ name, email, password });
+      
+        // Throw error if validation fails
+        if (!result.success) {
+          let errorMessages: string[] = [];
+
+          const errors = result.error.flatten().fieldErrors;
+
+          if (errors.name && errors.name.length > 0) {
+            errorMessages = [ ...errorMessages, ...errors.name ];
+          }
+
+          if (errors.email && errors.email.length > 0) {
+            errorMessages = [ ...errorMessages, ...errors.email ];
+          }
+
+          if (errors.password && errors.password.length > 0) {
+            errorMessages = [ ...errorMessages, ...errors.password ];
+          }
+
+          validator.throwError(400, errorMessages.join(' | '));
+
+        // Process user credentials
         } else {
-          const foundUser = await pg.getUserByAuthEmail(email);
+          dbUser = await pg.getUserByAuthEmail(email as string);
 
           // Found existing user -> throw error
           // User not found -> new user registration
-          if (foundUser) {
+          if (dbUser) {
             validator.throwError(400, 'User already exists');
-          } else {
-            const newUser = await pg.createUserByAuthEmail(email, password, name);
 
-            if (!newUser) {
+          } else {
+            dbUser = await pg.createUserByAuthEmail(
+              email as string,
+              password as string,
+              name as string
+            );
+
+            if (!dbUser) {
               validator.throwError(400, 'Error creating new user');
             }
-
-            authError = null;
           }
         }
       }
@@ -73,7 +109,7 @@ export async function authorizeUser() {
           password: z
             .string()
             .min(8, { message: 'Password must be at least 8 characters'})
-        })
+        });
 
         const result = loginSchema.safeParse({ email, password });
       
@@ -95,30 +131,24 @@ export async function authorizeUser() {
         
         // Process user credentials
         } else {
-          const foundUser = await pg.getUserByAuthEmail(email as string);
+          dbUser = await pg.getUserByAuthEmail(email as string);
 
-          if (!foundUser) {
+          if (!dbUser) {
             validator.throwError(400, 'User not found');
+
           } else {
             const match = await bcrypt.compare(
               password as string,
-              foundUser.credentials_password
+              dbUser.credentials_password
             );
 
             if (!match) {
               validator.throwError(400, 'Password is invalid');
             }
-
-            authError = null;
           }
         }
       }
 
-      // TODO: Update session info
-      await unstable_update({
-        user: { name: `Serverserver-man__${Math.random()}` }
-      });
-    
     } catch (error: any) {
       authError = {
         message: error?.message || 'Unknown error',
@@ -126,23 +156,80 @@ export async function authorizeUser() {
       };
     }
   }
-  
+
   /* =============================================================
-  Google authorization passing
+  OAuth authorization passing
   ============================================================= */
 
-  if (authProvider === 'google') {
-    // TODO: all for google 
-    redirect('/debug');
+  const changeGoogleAvatarSize = (imageUrl: string) => {
+    return typeof imageUrl === 'string'
+      ? imageUrl.replace('w=s96-c', 'w=s512-c')
+      : imageUrl;
+  };
+
+  if (authProvider === 'google' || authProvider === 'github') {
+    let userId = null;
+    let userName = null;
+    let userAvatar = null;
+
+    switch (authProvider) {
+      case 'google':
+        userId = sessionUser.provider_data?.sub;
+        userName = sessionUser.provider_data?.name;
+        userAvatar = changeGoogleAvatarSize(sessionUser.provider_data?.picture);
+        break;
+      case 'github':
+        userId = String(sessionUser.provider_data?.id);
+        userName = sessionUser.provider_data?.login;
+        userAvatar = sessionUser.provider_data?.avatar_url;
+        break;
+    }
+    if (!userId || !userName || !userAvatar) {
+      const msgIss = authProvider.charAt(0).toUpperCase() + authProvider.slice(1);
+      validator.throwError(400, `Invalid user info from your ${msgIss} account`);
+
+    } else {
+      try {
+        dbUser = await pg.getUserByAuthId(authProvider, userId);
+
+        if (!dbUser) {
+          dbUser = await pg.createUserByAuthId(authProvider, userId, userName, userAvatar);
+
+          if (!dbUser) {
+            validator.throwError(400, 'Error creating new user');
+          }
+        }
+
+      } catch (error: any) {
+        authError = {
+          message: error?.message || 'Unknown error',
+          code: error?.code || 500
+        };
+      }
+    }
   }
 
   /* =============================================================
-  GitHub authorization passing
+  Update session (on success)
   ============================================================= */
 
-  if (authProvider === 'github') {
-    // TODO: all for github 
-    redirect('/debug');
+  if (!authError && dbUser) {
+    await unstable_update({
+      user: {
+        name: dbUser.profile_name,
+        email: null,
+        sub: null,
+        picture: null,
+        provider_data: null,
+        db_data: {
+          uuid: dbUser.uuid,
+          profile_avatar: dbUser.profile_avatar,
+          profile_url: dbUser.profile_url_custom || dbUser.profile_url_default,
+          profile_name: dbUser.profile_name,
+          is_admin: dbUser.is_admin,
+        }
+      } as any
+    });
   }
 
   /* =============================================================

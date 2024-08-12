@@ -29,13 +29,12 @@ const changeCoverData = {
   }
 };
 
-export default function Profile({
-  data,
-  onSaveData
-}: {
+interface ProfileProps {
   data: any;
   onSaveData: (data: any) => void
-}) {
+}
+
+export default function Profile({ data, onSaveData }: ProfileProps) {
   const router = useRouter();
 
   const { isAuthenticated, providerStamp, name, avatar, cover, about } = data;
