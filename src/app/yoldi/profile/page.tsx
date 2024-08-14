@@ -1,9 +1,22 @@
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Main Page',
+  title: 'Yoldi Profile Page',
 };
 
-export default function MainPage() {
-  redirect('/yoldi/profile/me');
+interface RedirectToProfileProps {
+  searchParams?: {
+    [key: string]: string | string[] | undefined
+  };
+}
+
+export default function RedirectToProfile({ searchParams }: RedirectToProfileProps) {
+  const error = searchParams?.error;
+  const code = searchParams?.code;
+
+  const redirectUrl = error && code
+    ? `/yoldi/profile/me?error=${error}&code=${code}`
+    : `/yoldi/profile/me`;
+  
+  redirect(redirectUrl);
 }

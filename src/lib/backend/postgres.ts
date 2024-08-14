@@ -125,7 +125,7 @@ Update profile info
 async function updateProfile(
   data: any
 ): Promise<AnyFieldsObject | undefined | never> {
-  const { uuid, name, about, idForUrl } = data;
+  const { uuid, name, idForUrl, about } = data;
 
   const paramsForSet: string[] = [];
   const paramsToPass: any[] = [uuid];
@@ -136,9 +136,9 @@ async function updateProfile(
   };
 
   name && addParam('profile_name', name);
-  about && addParam('profile_about', about);
   idForUrl && addParam('profile_url_custom', idForUrl);
-
+  about && addParam('profile_about', about);
+  
   if (paramsToPass.length < 2) {
     return;
   }

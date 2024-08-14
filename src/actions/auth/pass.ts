@@ -7,13 +7,14 @@ import { z } from 'zod';
 import { auth, signOut, unstable_update} from '@/lib/auth/next-auth';
 import validator from '@/lib/backend/validator';
 import pg from '@/lib/backend/postgres';
-import type { userWithExtraData } from '@/types';
+import type { UserWithExtraData } from '@/types';
+import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
 
 const defaultError = { message: 'Failed to authenticate', code: 401 };
 
 export async function authorizeUser() {
   const session = await auth();
-  const sessionUser = session?.user as userWithExtraData;
+  const sessionUser = session?.user as UserWithExtraData;
 
   if (!sessionUser?.provider_data) {
     return signOut({
@@ -58,22 +59,7 @@ export async function authorizeUser() {
       
         // Throw error if validation fails
         if (!result.success) {
-          let errorMessages: string[] = [];
-
-          const errors = result.error.flatten().fieldErrors;
-
-          if (errors.name && errors.name.length > 0) {
-            errorMessages = [ ...errorMessages, ...errors.name ];
-          }
-
-          if (errors.email && errors.email.length > 0) {
-            errorMessages = [ ...errorMessages, ...errors.email ];
-          }
-
-          if (errors.password && errors.password.length > 0) {
-            errorMessages = [ ...errorMessages, ...errors.password ];
-          }
-
+          const errorMessages = convertErrorZodResultToMsgArray(result);
           validator.throwError(400, errorMessages.join(' | '));
 
         // Process user credentials
@@ -115,18 +101,7 @@ export async function authorizeUser() {
       
         // Throw error if validation fails
         if (!result.success) {
-          let errorMessages: string[] = [];
-
-          const errors = result.error.flatten().fieldErrors;
-
-          if (errors.email && errors.email.length > 0) {
-            errorMessages = [ ...errorMessages, ...errors.email ];
-          }
-
-          if (errors.password && errors.password.length > 0) {
-            errorMessages = [ ...errorMessages, ...errors.password ];
-          }
-
+          const errorMessages = convertErrorZodResultToMsgArray(result);
           validator.throwError(400, errorMessages.join(' | '));
         
         // Process user credentials
@@ -246,5 +221,5 @@ export async function authorizeUser() {
     });
   }
 
-  redirect('/debug');
+  redirect('/yoldi/profile/me');
 }

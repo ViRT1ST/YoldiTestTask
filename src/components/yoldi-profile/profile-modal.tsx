@@ -6,16 +6,16 @@ import tw from 'tailwind-styled-components';
 
 import ButtonLarge from '@/components/yoldi-common/button-large';
 
-export default function ProfileModal({
-  isOpen, data, onSaveData, close
-}: {
+interface ProfileModalProps {
   isOpen: boolean;
   data: any;
   onSaveData: (data: any) => void;
   close: () => void;
-}) {
+}
+
+export default function ProfileModal({ isOpen, data, onSaveData, close }: ProfileModalProps) {
   const { name, profileUrl, about } = data;
-  
+
   const [nameText, setNameText] = useState(name);
   const [idForUrlText, setIdForUrlText] = useState(profileUrl);
   const [aboutText, setAboutText] = useState(about);
@@ -48,6 +48,7 @@ export default function ProfileModal({
       idForUrl: idForUrlText,
       about: aboutText
     });
+    // window.location.reload();
   };
   
   const modal = (
@@ -107,7 +108,6 @@ const EditInfoForm = tw.form`
   px-[30px] py-[30px]
   flex flex-col
   bg-white
-
   w-full sm:w-[600px] 
   h-full sm:h-[580px] 
   flex-grow sm:flex-grow-0
@@ -157,6 +157,7 @@ const EditInfoTextArea = tw.textarea`
   outline-none border rounded-[5px] border-[#D4D4D4]
   caret-black/70 leading-[26px]
   focus:border-[#838383]
+  resize-none
 `;
 
 const CancelButton = tw(ButtonLarge)`

@@ -1,6 +1,8 @@
 import { User } from 'next-auth';
 import { z } from 'zod';
 
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
+
 /* =============================================================
 Database Schemas And Types
 ============================================================= */
@@ -45,7 +47,7 @@ export type AuthFormData = {
   isRegistrationPage: boolean,
 }
 
-export type userWithExtraData = User & ({
+export type UserWithExtraData = User & ({
   provider_data?: {
     name?: string;
     email?: string;
@@ -57,6 +59,33 @@ export type userWithExtraData = User & ({
     login: string;
     id: number;
     avatar_url: string;
+  },
+  db_data: {
+    uuid: string,
+    profile_avatar: string | null,
+    profile_url: string,
+    profile_name: string,
+    is_admin: boolean
   }
   iss?: string
 }) | undefined;
+
+export type AuthConstants = {
+  [REGISTRATION_STRING]: {
+    question: string;
+    label: string;
+    path: string;
+  };
+  [LOGIN_STRING]: {
+    question: string;
+    label: string;
+    path: string;
+  };
+  authPageUrlPart: string;
+}
+
+export type ProfileInfo = {
+  name: string,
+  idForUrl: string,
+  about: string
+}

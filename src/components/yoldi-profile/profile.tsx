@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import tw from 'tailwind-styled-components';
 import Image from 'next/image';
+import { toast } from 'react-toastify';
 
 import {
   EditIcon,
@@ -35,11 +36,12 @@ interface ProfileProps {
 }
 
 export default function Profile({ data, onSaveData }: ProfileProps) {
+  const searchParams = useSearchParams();
   const router = useRouter();
 
-  const { isAuthenticated, providerStamp, name, avatar, cover, about } = data;
-  console.log(data);
+  const [errorMsg, setErrorMsg] = useState(searchParams.get('error') || null);
 
+  const { isAuthenticatedToEdit, providerStamp, name, avatar, cover, about } = data;
   const nameFirstLetter = name.charAt(0) as string;
 
   const [isCoverExist, setIsCoverExist] = useState(false);
@@ -51,10 +53,14 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
     ? changeCoverData.remove
     : changeCoverData.upload;
 
-  // useEffect(() => {
-    
-  //   console.log('refreshed');
-  // }, [name, avatar, idForUrl, cover, about]);
+  useEffect(() => {
+    if (errorMsg) {
+      router.push('/yoldi/profile/me');
+      toast.error(errorMsg);
+    }
+
+    setTimeout(() => setErrorMsg(null), 10000);
+  }, [errorMsg]);
 
   const inputFileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hasFile = Boolean(e.target.files?.length);
@@ -77,7 +83,7 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
 
       <CoverContainer>
 
-      {isAuthenticated && (
+      {isAuthenticatedToEdit && (
         <>
           <input
             ref={hiddenFileInputRef}
@@ -128,7 +134,7 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
             <UserName>{name}</UserName>
             <UserProviderStamp>{providerStamp}</UserProviderStamp>
 
-            {isAuthenticated && (
+            {isAuthenticatedToEdit && (
               <EditButtonInContent onClick={() => setIsModalOpen(!isModalOpen)}>
               <SvgContainer><EditIcon /></SvgContainer>
               <span>Редактировать</span>
@@ -139,7 +145,18 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
               {about}
             </UserAbout>
 
-            {isAuthenticated && (
+            {errorMsg && (
+              <ErrorContainer>
+                <p className="text-red-600">Error</p>
+                <ul >
+                  {errorMsg.split(' | ').map((error) => (
+                    <li key={error}>* {error}</li>
+                  ))}
+                </ul>
+            </ErrorContainer>
+            )}
+
+            {isAuthenticatedToEdit && (
               <LogoutButton onClick={() => signOut()}>
                 <SvgContainer>
                   <LogoutIcon />
@@ -150,7 +167,7 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
           </Content>
 
           <Aside>
-          {isAuthenticated && (
+          {isAuthenticatedToEdit && (
             <EditButtonInAside onClick={() => setIsModalOpen(!isModalOpen)}>
               <SvgContainer>
                 <EditIcon />
@@ -246,4 +263,8 @@ const LogoutButton = tw(ButtonNormal)`
   mt-[59.5px]
 `;
 
+const ErrorContainer = tw.div`
+  w-full px-2 py-2 my-6 flex flex-col justify-center
+  text-black bg-red-50 rounded-[5px]
+`;
 

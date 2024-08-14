@@ -1,49 +1,46 @@
 'use client';
 
-import { useSearchParams, useRouter  } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import tw from 'tailwind-styled-components';
 import Image from 'next/image';
 
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
+import { AuthConstants } from '@/types';
 import { HeaderLogo } from '@/components/yoldi-common/icons';
 import ButtonNormal from '@/components/yoldi-common/button-normal';
 
-export const constants = {
-  [REGISTRATION_STRING]: {
-    authButtonText: 'Войти',
-    authButtonPath: '/yoldi/auth?method=login',
-  },
-  [LOGIN_STRING]: {
-    authButtonText: 'Зарегистрироваться',
-    authButtonPath: '/yoldi/auth?method=registration',
-  },
-  authPageUrlPart: 'yoldi/auth',
-};
+interface HeaderProps {
+  userData: {
+    [key: string]: any;
+  } | null;
+  authConstants: AuthConstants;
+}
 
-export default function Header() {
+export default function Header({ userData, authConstants }: HeaderProps) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
 
-  const searchParams = useSearchParams();
   const isRegistrationPage = searchParams.get('method') === REGISTRATION_STRING;
+  const isAuthPage = pathname.includes(authConstants.authPageUrlPart);
 
   const pageData = isRegistrationPage
-    ? constants[REGISTRATION_STRING]
-    : constants[LOGIN_STRING];
+    ? authConstants[LOGIN_STRING]
+    : authConstants[REGISTRATION_STRING];
 
-  const session = useSession() as any;
-  const isUserAuthenticated = Boolean(session?.data?.user);
-  const userPicture = session?.data?.user?.profile_avatar;
-  const userNameFull = session?.data?.user?.profile_name || 'Anonymous';
+  const isUserAuthenticated = Boolean(userData);
+
+  const userPicture = userData?.profile_avatar || null;
+  const userNameFull = userData?.profile_name || 'Anonymous';
   const userNameShort = userNameFull.split(' ')[0];
   const userNameFirstLetter = userNameFull.charAt(0);
 
   const handleAuthButtonClick = () => {
-    router.push(pageData.authButtonPath);
+    router.push(pageData.path);
   };
 
   const handleUserAvatarClick = () => {
-    console.log('click');
+    console.log('handleUserAvatarClick');
   };
 
   return (
@@ -59,7 +56,7 @@ export default function Header() {
       </LogoArea>
 
       <UserArea>
-        {isUserAuthenticated ? (
+        {!isAuthPage && isUserAuthenticated ? (
           <>
             <UserName>{userNameShort}</UserName>
             <UserAvatarContainer onClick={handleUserAvatarClick}>
@@ -79,8 +76,8 @@ export default function Header() {
             </UserAvatarContainer>
           </>
         ) : (
-          <ButtonNormal onClick={handleAuthButtonClick} className={'px-8 mt-[1px]'}>
-            {pageData.authButtonText}
+          <ButtonNormal className={'px-8 mt-[1px]'} onClick={handleAuthButtonClick}>
+            {pageData.label}
           </ButtonNormal>
         )}
       </UserArea>

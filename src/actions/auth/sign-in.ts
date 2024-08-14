@@ -2,7 +2,7 @@
 
 import * as auth from '@/lib/auth/next-auth';
 
-const authRedirect = '/yoldi/auth/pass'
+const authRedirect = '/yoldi/auth/pass';
 
 export async function credetialsSignIn(additionalData: object, formData: FormData) {
   const userData = {

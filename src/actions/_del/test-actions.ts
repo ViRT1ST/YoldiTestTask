@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 import * as auth from '@/lib/auth/next-auth';
 import validator from '@/lib/backend/validator';
 import pg from '@/lib/backend/postgres';
-import type { userWithExtraData } from '@/types';
+import type { UserWithExtraData } from '@/types';
 
 export async function credetialsForm() {
   console.log('credetials Form');
@@ -42,7 +42,7 @@ export async function googleForm() {
 
 export async function authorizeUser() {
   const session = await auth.auth();
-  const user = session?.user as userWithExtraData;
+  const user = session?.user as UserWithExtraData;
 
   let redirectError: any = null;
   // redirect('/debug');

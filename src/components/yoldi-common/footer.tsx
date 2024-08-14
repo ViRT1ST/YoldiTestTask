@@ -5,39 +5,29 @@ import tw from 'tailwind-styled-components';
 import Link from 'next/link';
 
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
+import { AuthConstants } from '@/types';
 
-const constants = {
-  [REGISTRATION_STRING]: {
-    LinkQuestion: 'Уже есть аккаунт?',
-    linkText: 'Войти',
-    linkPath: '/yoldi/auth?method=login',
-  },
-  [LOGIN_STRING]: {
-    LinkQuestion: 'Еще нет аккаунта?',
-    linkText: 'Зарегистрироваться',
-    linkPath: '/yoldi/auth?method=registration',
-  },
-};
+interface FooterProps {
+  authConstants: AuthConstants;
+}
 
-const authPageUrlPart = 'yoldi/auth';
-
-export default function Footer() {
-  const pathname = usePathname();
-  const isAuthPage = pathname.includes(authPageUrlPart);
-
+export default function Footer({ authConstants }: FooterProps) {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+
   const isRegistrationPage = searchParams.get('method') === REGISTRATION_STRING;
+  const isAuthPage = pathname.includes(authConstants.authPageUrlPart);
 
   const pageData = isRegistrationPage
-    ? constants[REGISTRATION_STRING]
-    : constants[LOGIN_STRING];
+    ? authConstants[LOGIN_STRING]
+    : authConstants[REGISTRATION_STRING];
 
   if (isAuthPage) {
     return (
       <Container>
-        <StyledLink href={pageData.linkPath}>
-          <LeftPart>{pageData.LinkQuestion}</LeftPart>
-          <RightPart>{pageData.linkText}</RightPart>
+        <StyledLink href={pageData.path}>
+          <LeftPart>{pageData.question}</LeftPart>
+          <RightPart>{pageData.label}</RightPart>
         </StyledLink>
       </Container>
     );

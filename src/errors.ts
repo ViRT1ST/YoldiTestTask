@@ -9,4 +9,4 @@ export const errors = {
   'A008': { message: 'Error creating new user', code: 500 },
   'A009': { message: 'Invalid password', code: 400 },
   'S001': { message: 'Unknown error', code: 500 }
-}
+};

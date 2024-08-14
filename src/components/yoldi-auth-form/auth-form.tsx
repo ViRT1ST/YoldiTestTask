@@ -57,7 +57,6 @@ export default function AuthForm() {
 
   const [errorMsg, setErrorMsg] = useState(urlErrorMessage || null);
   
-
   const pageData = isRegistrationPage
     ? pageDataSwitch[REGISTRATION_STRING]
     : pageDataSwitch[LOGIN_STRING];
@@ -76,9 +75,8 @@ export default function AuthForm() {
       router.push(`?method=${urlMethod}`);
       toast.error(urlErrorMessage);
     }
-    setTimeout(() => {
-      setErrorMsg(null);
-    }, 10000);
+
+    setTimeout(() => setErrorMsg(null), 10000);
   }, [urlErrorMessage]);
 
   useEffect(() => {

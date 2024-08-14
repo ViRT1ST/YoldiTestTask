@@ -2,21 +2,47 @@ import tw from 'tailwind-styled-components';
 
 import Header from '@/components/yoldi-common/header';
 import Footer from '@/components/yoldi-common/footer';
+import { auth } from '@/lib/auth/next-auth';
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
+import type { UserWithExtraData } from '@/types';
+
+export const authConstants = {
+  [LOGIN_STRING]: {
+    question: 'Уже есть аккаунт?',
+    label: 'Войти',
+    path: '/yoldi/auth?method=login'
+  },
+  [REGISTRATION_STRING]: {
+    question: 'Уже есть аккаунт?',
+    label: 'Зарегистрироваться',
+    path: '/yoldi/auth?method=registration'
+  },
+  authPageUrlPart: 'yoldi/auth',
+};
 
 interface YoldiLayoutProps {
   children: React.ReactNode;
 }
 
-export default function YoldiLayout({ children }: YoldiLayoutProps) {
+export default async function YoldiLayout({ children }: YoldiLayoutProps) {
+  const session = await auth();
+  const sessionUser = session?.user as UserWithExtraData;
+
+  let userData: any = null;
+
+  if (sessionUser?.db_data) {
+    userData = sessionUser.db_data;
+  }
+
   return (
     <Container>
-      <Header />
+      <Header authConstants={authConstants} userData={userData} />
 
       <Main>
         {children}
       </Main>
 
-      <Footer />
+      <Footer authConstants={authConstants} />
     </Container>
   );
 }

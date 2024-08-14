@@ -1,8 +1,11 @@
 import { revalidatePath } from 'next/cache';
 
-import { auth } from '@/lib/auth/next-auth';
+import { auth, signOut } from '@/lib/auth/next-auth';
 import Profile from '@/components/yoldi-profile/profile';
 import pg from '@/lib/backend/postgres';
+import type { UserWithExtraData, ProfileInfo } from '@/types';
+import { redirect } from 'next/navigation';
+import { changeProfileInfo } from '@/actions';
 
 export const metadata = {
   title: 'Yoldi Profile Page',
@@ -15,92 +18,68 @@ const defaultAboutText = `
   лишь показать наличие самого текста или продемонстрировать типографику в деле.
 `.replace(/\s+/g, ' ').trim();
 
-const userNotFoundContent = (
-  <p className="mt-10 mx-auto">
-    Пользователь не найден
-  </p>
-);
-
 export default async function ProfilePage(context: any) {
-  const session = await auth() as any;
-  const sessionUser = session?.user;
-  
+  const session = await auth();
+  const sessionUser = session?.user as UserWithExtraData;
+  const sessionProvider = sessionUser?.iss;
+  const sessionUuid = sessionUser?.db_data?.uuid;
+
   const slug = context?.params?.slug?.[0];
 
-  const userByUuid = await pg.getUserByUuid(sessionUser?.uuid) as any;
-  const userBySlug = await pg.getUserByProfileUrl(slug) as any;
+  let dbUser: any = null;
 
-  if (slug !== 'me' && !userBySlug) {
-    return userNotFoundContent;
+  // redirect if user is not logged and wants to access "current" user profile
+  if (slug === 'me' && !sessionUuid) {
+    redirect('/yoldi/auth');
   }
 
-  const dbUser = userBySlug || userByUuid || null;
+  // db user is same as in session
+  if (slug === 'me' && sessionUuid) {
+    dbUser = await pg.getUserByUuid(sessionUuid as string);
+  }
+  
+  // db user is any user except "current", no matter if current session user exist
+  if (slug !== 'me') {
+    dbUser = await pg.getUserByProfileUrl(slug as string);
+  }
 
   if (!dbUser) {
-    return userNotFoundContent;
+    return (
+      <p className="mt-10 mx-auto">
+        Пользователь не найден
+      </p>
+    );
   }
 
-  const isAuthenticated = dbUser?.uuid === sessionUser?.uuid;
-
-  const userData: any = {
-    isAuthenticated,
+  const dataToPass: any = {
+    isAuthenticatedToEdit: sessionUuid === dbUser?.uuid,
     uuid: dbUser.uuid,
-    providerStamp: 'N/A',
+    avatar: dbUser.profile_avatar,
+    name: dbUser.profile_name,
+    profileUrl: dbUser.profile_url_custom || dbUser.profile_url_default,
+    cover: dbUser.profile_cover,
+    about: dbUser.profile_about || defaultAboutText,
   };
 
-  const sessionData = isAuthenticated && sessionUser || null;
+  const provider = sessionProvider || dbUser.default_provider;
 
-  const provider = sessionData && sessionData?.provider || dbUser.default_provider;
   switch (provider) {
     case 'google':
-      userData.providerStamp = 'Пользователь Google';
+      dataToPass.providerStamp = 'Пользователь Google';
       break;
     case 'github':
-      userData.providerStamp = 'Пользователь GitHub';
+      dataToPass.providerStamp = 'Пользователь GitHub';
       break;
     case 'credentials':
-      userData.providerStamp = dbUser.credentials_email;
+      dataToPass.providerStamp = dbUser.credentials_email;
+      break;
+    default:
+      dataToPass.providerStamp = 'N/A';
       break;
   }
 
-  userData.avatar = sessionData?.profile_avatar || dbUser.profile_avatar;
-  userData.name = sessionData?.profile_name || dbUser.profile_name;
-  userData.profileUrl = dbUser.profile_url_custom || dbUser.profile_url_default;
-  userData.cover = dbUser.profile_cover;
-  userData.about = dbUser.profile_about || defaultAboutText;
-
-  const saveData = async (data: any) => {
-    'use server';
-
-    const { name, about, idForUrl } = data;
-
-    const dataForSave: any = {
-      uuid: sessionUser?.uuid,
-    };
-
-    if (name !== userData.name && name.trim().length > 2) {
-      dataForSave.name = name;
-    }
-
-    if (about !== defaultAboutText && about.trim().length > 0) {
-      dataForSave.about = about;
-    }
-
-    if (
-      !idForUrl.startsWith('id') &&
-      idForUrl !== userData.profileUrl &&
-      idForUrl.length > 2 &&
-      idForUrl.match(/^[a-zA-Z0-9_]+$/)
-    ) {
-      dataForSave.idForUrl = idForUrl;
-    }
-  
-    await pg.updateProfile(dataForSave);
-    revalidatePath('/yoldi/profile');
-  };
-
   return (
-    <Profile data={userData} onSaveData={saveData} />
+    <Profile data={dataToPass} onSaveData={changeProfileInfo} />
   );
 }
 
