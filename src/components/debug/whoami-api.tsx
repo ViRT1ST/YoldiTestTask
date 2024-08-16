@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-// import * as constants from '@/constants';
 
 export default function WhoAmIAPI() {
-  const [user, setUser] = useState(null);
-  // console.log(user);
-  
-  // console.log(constants.API_AUTH_BASE_PATH);
+  const [name, setName] = useState(null);
 
   useEffect(() => {
     fetch('/api/debug')
       .then((res) => res.json())
-      .then(({ user }) => setUser(user?.name || user?.profile_name));
+      .then(({ user }) => {
+        setName(user?.db_data?.profile_name || user?.name);
+      });
   }, []);
   
-  return <div>Who Am I (client): {user}</div>;
+  return (
+    <div>Who Am I (Client): {name}</div>
+  );
 }

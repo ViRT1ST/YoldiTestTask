@@ -4,8 +4,8 @@ export const metadata = {
 
 export default function MainPage() {
   return (
-    <>
-      Text
-    </>
+    <div>
+      Main Page [/yoldi/]
+    </div>
   );
 }

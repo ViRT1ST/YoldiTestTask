@@ -3,16 +3,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import tw from 'tailwind-styled-components';
-import clsx from 'clsx';
+import { twMerge, twJoin } from 'tailwind-merge';
 
 import {
   NameIcon,
   EmailIcon,
   PasswordIcon,
   PasswordVisibilityIcon
-} from '@/components/yoldi-common/icons';
-import ButtonLarge from '@/components/yoldi-common/button-large';
+} from '@/components/yoldi-ui/icons';
+import Button from '@/components/yoldi-ui/button';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 import * as actions from '@/actions';
 
@@ -30,7 +29,7 @@ const pageDataSwitch = {
 };
 
 const defaultInputValues = {
-  name: '', //'Владислав',
+  name: 'Владислав', //'Владислав',
   email: 'example@gmail.com', //'example@gmail.com',
   password: 'password123!', // 'password123!',
 };
@@ -91,14 +90,17 @@ export default function AuthForm() {
   // }, []);
 
   return (
-    <Container>
-      <Title>{pageData.title}</Title>
+    <div className={twContainer}>
+      <h1 className={twTitle}>{pageData.title}</h1>
 
       <form action={actions.credetialsSignIn.bind(null, { formUrl })}>
-        <AllInputFieldsContainer>
+
+        <div className={twInputFieldsContainer}>
+          
           {isRegistrationPage && (
-            <InputFieldContainer>
-              <InputField
+            <div className={twInputFieldContainer}>
+              <input
+                className={twInputField}
                 ref={nameInputRef}
                 type="text"
                 name="name"
@@ -106,16 +108,15 @@ export default function AuthForm() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
-      
-              <SvgContainer className="top-[15.5px] left-[24px]">
+              <span className={twMerge(twSvgContainer, 'top-[15.5px] left-[24px]')}>
                 <NameIcon />
-              </SvgContainer>
-            </InputFieldContainer>
+              </span>
+            </div>
           )}
 
-          <InputFieldContainer>
+          <div className={twInputFieldContainer}>
             <input
-              className={inputFieldClasses}
+              className={twInputField}
               ref={emailInputRef}
               type="email"
               name="email"
@@ -123,28 +124,26 @@ export default function AuthForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-
-            <SvgContainer className="top-[18.5px] left-[22px]">
+            <span className={twMerge(twSvgContainer, 'top-[18.5px] left-[22px]')}>
               <EmailIcon />
-            </SvgContainer>
-          </InputFieldContainer>
+            </span>
+          </div>
 
-          <InputFieldContainer>
-            <InputField
-              className="pr-14"
+          <div className={twInputFieldContainer}>
+            <input
+              className={twMerge(twInputField, 'pr-14')}
               type={passwordInputType}
               name="password"
               placeholder="Пароль"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-
-            <SvgContainer className="top-[14.5px] left-[24px]">
+            <span className={twMerge(twSvgContainer, 'top-[14.5px] left-[24px]')}>
               <PasswordIcon />
-            </SvgContainer>
-
-            <SvgContainer
-              className={clsx(
+            </span>
+            <span
+              className={twMerge(
+                twSvgContainer,
                 'right-[20px] pt-[18.5px] h-[50px] cursor-pointer',
                 isPasswordEmpty && 'opacity-50'
               )}
@@ -153,68 +152,71 @@ export default function AuthForm() {
               }}
             >
               <PasswordVisibilityIcon />
-            </SvgContainer>
-          </InputFieldContainer>
+            </span>
+          </div>
 
           {errorMsg && (
-            <ErrorContainer>
+            <div className={twErrorContainer}>
               <p className="text-red-600">Authentification error</p>
               <ul >
                 {errorMsg.split(' | ').map((error) => (
                   <li key={error}>* {error}</li>
                 ))}
               </ul>
-            </ErrorContainer>
+            </div>
           )}
 
-        </AllInputFieldsContainer>
+        </div>
 
-        <ButtonLarge
-          className={clsx('w-full')}
+        <Button 
+          className="w-full"
           type="submit"
-          light={false}
           title={pageData.submitButtonTooltip}
+          size="big"
+          colors="dark"
           disabled={!isFieldsFilled}
         >
           {pageData.submitButtonText}
-        </ButtonLarge>
+        </Button>
 
       </form>
       
-      <SocialAuthHintContainer>
-        <SocialAuthHintLine />
-        <SocialAuthHintText>ИЛИ ВОЙТИ ЧЕРЕЗ СОЦИАЛЬНУЮ СЕТЬ</SocialAuthHintText>
-        <SocialAuthHintLine />
-      </SocialAuthHintContainer>
+      <div className={twOAuthHintContainer}>
+        <div className={twOAuthHintLine} />
+        <div className={twOAuthHintText}>ИЛИ ВОЙТИ ЧЕРЕЗ СОЦИАЛЬНУЮ СЕТЬ</div>
+        <div className={twOAuthHintLine} />
+      </div>
 
-      <SocialAuthButtonsContainer>
+      <div className={twOAuthButtonsContainer}>
         <form action={actions.googleSignIn} className="w-full">
-          <ButtonLarge
+          <Button
             className="w-full"
             type="submit"
-            light={true}
-            title={'Войти через Google'}
+            title="Войти через Google"
+            size="big"
+            colors="light"
           >
             Google
-          </ButtonLarge>
+          </Button>
         </form>
 
         <form action={actions.githubSignIn} className="w-full">
-          <ButtonLarge
+          <Button
             className="w-full"
             type="submit"
-            light={true}
-            title={'Войти через GitHub'}
+            title="Войти через GitHub"
+            size="big"
+            colors="light"
           >
             GitHub
-          </ButtonLarge>
+          </Button>
         </form>
-      </SocialAuthButtonsContainer>
-    </Container>
+      </div>
+    </div>
   );
 }
 
-const Container = tw.div`
+const twContainer = twJoin(`
   w-[400px] mx-auto
   flex flex-col
   border-[#E6E6E6] rounded-[5px]
@@ -223,62 +225,55 @@ const Container = tw.div`
   my-[0px] xs:my-auto
   px-[31px] xs:px-[29px]
   py-[30px] xs:py-[29px] 
-`;
+`);
 
-const Title = tw.h1`
+const twTitle = twJoin(`
   mb-[25px]
   font-medium text-[30px] leading-[42px] whitespace-pre-line
-`;
+`);
 
-const AllInputFieldsContainer = tw.div`
+const twInputFieldsContainer = twJoin(`
   mb-[10px]
   px-0 xs:px-[5px] 
-`;
+`);
 
-const InputFieldContainer = tw.div`
+const twInputFieldContainer = twJoin(`
   relative mb-[15px] 
-`;
+`);
 
-const InputField = tw.input`
+const twInputField = twJoin(`
   h-[50px] w-full py-5 pl-[54px] pr-5
   outline-none border rounded-[5px] border-[#D4D4D4]
   placeholder-[#838383] caret-black/70
   focus:border-[#838383]
-`;
+`);
 
-const inputFieldClasses = clsx(
-  'h-[50px] w-full py-5 pl-[54px] pr-5',
-  'outline-none border rounded-[5px] border-[#D4D4D4]',
-  'placeholder-[#838383] caret-black/70',
-  'focus:border-[#838383]'
-);
-
-const SvgContainer = tw.span`
+const twSvgContainer = twJoin(`
   absolute w-[25px] h-[25px]
-`;
+`);
 
-const SocialAuthHintContainer = tw.div`
+const twOAuthHintContainer = twJoin(`
   w-full my-5 
   flex items-center justify-center
-`;
+`);
 
-const SocialAuthHintLine = tw.div`
+const twOAuthHintLine = twJoin(`
   flex-grow
   border-t border-[#D4D4D4]
   hidden xs:block
-`;
+`);
 
-const SocialAuthHintText = tw.div`
+const twOAuthHintText = twJoin(`
   w-auto mx-4
   flex-grow-0
   text-xs text-[#838383] text-center 
-`;
+`);
 
-const SocialAuthButtonsContainer = tw.div`
+const twOAuthButtonsContainer = twJoin(`
   flex flex-row gap-[10px]
-`;
+`);
 
-const ErrorContainer = tw.div`
+const twErrorContainer = twJoin(`
   w-full px-2 py-2 mb-4 flex flex-col justify-center
   text-black bg-red-50 rounded-[5px]
-`;
+`);

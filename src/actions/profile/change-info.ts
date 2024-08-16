@@ -25,12 +25,14 @@ export async function changeProfileInfo(data: ProfileInfo) {
     const updateInfoSchema = z.object({
       name: z
         .string()
+        .trim()
         .min(3, { message: 'Name must be at least 3 characters'}),
       idForUrl: z
         .string()
+        .trim()
         .min(3, { message: 'URL ID must be at least 3 characters'})
         .refine(
-          (value) => /^[^id][a-zA-Z0-9]+$/.test(value ?? ""), {
+          (value) => /^[^id][a-zA-Z0-9]+$/.test(value ?? ''), {
             message: 'URL ID must contain only letters and numbers and cannot start with string "id"'
         }),
         // .optional()
@@ -51,13 +53,14 @@ export async function changeProfileInfo(data: ProfileInfo) {
       // Process user data
       } else {
         const { name, idForUrl, about } = result.data;
-        const betterAbout = about.replace(/\s+/g, ' ').trim();
+        const fixedAbout = about.replace(/\s+/g, ' ');
+        const fixedIdForUrl = idForUrl.toLowerCase();
 
         await pg.updateProfile({
           uuid: sessionUuid,
           name: name,
-          idForUrl: idForUrl,
-          about: betterAbout
+          idForUrl: fixedIdForUrl,
+          about: fixedAbout
         });
 
         await unstable_update({
@@ -65,7 +68,7 @@ export async function changeProfileInfo(data: ProfileInfo) {
             db_data: {
               ...sessionUser?.db_data,
               profile_name: name || sessionUser?.db_data?.profile_name,
-              profile_url: idForUrl || sessionUser?.db_data?.profile_url
+              profile_url: fixedIdForUrl || sessionUser?.db_data?.profile_url
             }
           }
         } as any);

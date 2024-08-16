@@ -1,6 +1,4 @@
-import { revalidatePath } from 'next/cache';
-
-import { auth, signOut } from '@/lib/auth/next-auth';
+import { auth } from '@/lib/auth/next-auth';
 import Profile from '@/components/yoldi-profile/profile';
 import pg from '@/lib/backend/postgres';
 import type { UserWithExtraData, ProfileInfo } from '@/types';

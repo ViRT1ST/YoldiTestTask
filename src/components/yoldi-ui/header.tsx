@@ -1,13 +1,13 @@
 'use client';
 
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import tw from 'tailwind-styled-components';
+import { twJoin } from 'tailwind-merge';
 import Image from 'next/image';
 
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 import { AuthConstants } from '@/types';
-import { HeaderLogo } from '@/components/yoldi-common/icons';
-import ButtonNormal from '@/components/yoldi-common/button-normal';
+import { HeaderLogo } from '@/components/yoldi-ui/icons';
+import Button from '@/components/yoldi-ui/button';
 
 interface HeaderProps {
   userData: {
@@ -44,22 +44,22 @@ export default function Header({ userData, authConstants }: HeaderProps) {
   };
 
   return (
-    <HeaderContainer>
+    <div className={twHeaderContainer}>
 
-      <LogoArea>
-        <LogoContainer>
+      <div className={twLogoArea}>
+        <div className={twLogoContainer}>
           <HeaderLogo />
-        </LogoContainer>
-        <TextForLogo>
+        </div>
+        <div className={twTextForLogo}>
           Разрабатываем и запускаем<br />сложные веб проекты
-        </TextForLogo>
-      </LogoArea>
+        </div>
+      </div>
 
-      <UserArea>
+      <div className={twUserArea}>
         {!isAuthPage && isUserAuthenticated ? (
           <>
-            <UserName>{userNameShort}</UserName>
-            <UserAvatarContainer onClick={handleUserAvatarClick}>
+            <span className={twUserName}>{userNameShort}</span>
+            <button className={twUserAvatarContainer} onClick={handleUserAvatarClick}>
               {userPicture ? (
                 <Image
                   src={userPicture}
@@ -71,64 +71,71 @@ export default function Header({ userData, authConstants }: HeaderProps) {
                   priority={true}
                 /> 
               ) : (
-                <UserFirstLetter>{userNameFirstLetter}</UserFirstLetter>
+                <div className={twUserFirstLetter}>
+                  {userNameFirstLetter}
+                </div>
               )}
-            </UserAvatarContainer>
+            </button>
           </>
         ) : (
-          <ButtonNormal className={'px-8 mt-[1px]'} onClick={handleAuthButtonClick}>
+          <Button
+            className={'px-8 mt-[1px]'}
+            colors="light"
+            size="normal"
+            onClick={handleAuthButtonClick}
+          >
             {pageData.label}
-          </ButtonNormal>
+          </Button>
         )}
-      </UserArea>
+      </div>
 
-    </HeaderContainer>
+    </div>
   );
 }
 
-const HeaderContainer = tw.div`
+const twHeaderContainer = twJoin(`
   h-20 px-5
   flex flex-row justify-between
   border-[#E6E6E6] border-b
   font-inter
-`;
+`);
 
-const LogoArea = tw.div`
+const twLogoArea = twJoin(`
   relative pt-[12.5px]
   flex flex-row flex-grow 
-`;
+`);
 
-const LogoContainer = tw.div`
+const twLogoContainer = twJoin(`
   h-[50px] w-20 mr-5 mt-[2.5px]
   bg-[#FEFF80] 
-`;
+`);
 
-const TextForLogo = tw.div`
+const twTextForLogo = twJoin(`
   absolute left-[100px] pt-[3px]
   text-base leading-[26px]
   hidden sm:block 
-`;
+`);
 
-const UserArea = tw.div`
+const twUserArea = twJoin(`
   flex flex-row items-center 
   pr-[11px] xs:pr-0
-`;
+`);
 
-const UserName = tw.span`
+const twUserName = twJoin(`
   mt-0.5
   leading-[26px]
-`;
+`);
 
-const UserAvatarContainer = tw.button`
+const twUserAvatarContainer = twJoin(`
   w-[50px] h-[50px] mt-[1px] ml-5
   flex justify-center items-center
   border-[#E6E6E6] border-[1px] rounded-full
   bg-[#F3F3F3]
   overflow-hidden
-`;
+`);
 
-const UserFirstLetter = tw.div`
+const twUserFirstLetter = twJoin(`
   w-fill h-full pl-[1px]
   flex justify-center items-center
   text-[18px] 
-`;
+`);

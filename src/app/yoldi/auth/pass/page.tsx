@@ -12,14 +12,12 @@ export default function AuthPassPage() {
     }
   }, []);
 
+  // Auto submit form
   return (
-    <div className="p-4">
-      {/* <h1>Redirecting to profile...</h1> */}
-      <div className="invisible">
-        <form ref={autoSubmitForm} name="autoSubmit" action={authorizeUser}>
-          <button type="submit">Update Session</button>
-        </form>
-      </div>
+    <div className="p-4 invisible">
+      <form ref={autoSubmitForm} name="autoSubmit" action={authorizeUser}>
+        <button type="submit">Update Session</button>
+      </form>
     </div>
   );
 }

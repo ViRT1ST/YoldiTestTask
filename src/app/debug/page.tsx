@@ -1,8 +1,6 @@
 import { auth } from '@/lib/auth/next-auth';
 
-
-import AuthServerButtons from '@/components/debug/auth-server-buttons';
-import WhoAmIServerAction from '@/components/debug/whoami-sa';
+import AuthButtons from '@/components/debug/auth-buttons';
 import WhoAmIAPI from '@/components/debug/whoami-api';
 import WhoAmIRSC from '@/components/debug/whoami-rsc';
 
@@ -21,15 +19,14 @@ export default async function TestPage() {
 
   return (
     <main className="px-10">
-      <h1 className="text-3xl mb-5">Debug Page</h1>
-      <div>--------</div>
+      <h1 className="text-3xl my-2">Debug Page</h1>
+      <div>-------------------------------------------------</div>
       <pre>*SESSION*<br/>{JSON.stringify(session, null, 2)}</pre>
-      <div>--------</div>
-      <WhoAmIServerAction onGetUserAction={onGetUserAction} />
+      <div>-------------------------------------------------</div>
       <WhoAmIAPI />
       <WhoAmIRSC />
-      <div className="mt-20">-----------------------------</div>
-      <AuthServerButtons />
+      <div>-------------------------------------------------</div>
+      <AuthButtons />
     </main>
   );
 }

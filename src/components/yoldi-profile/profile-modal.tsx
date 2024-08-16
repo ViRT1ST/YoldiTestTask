@@ -1,10 +1,10 @@
 'use client';
 
+import { twMerge, twJoin } from 'tailwind-merge';
 import { useState,useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import tw from 'tailwind-styled-components';
 
-import ButtonLarge from '@/components/yoldi-common/button-large';
+import Button from '@/components/yoldi-ui/button';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -52,59 +52,66 @@ export default function ProfileModal({ isOpen, data, onSaveData, close }: Profil
   };
   
   const modal = (
-    <Modal>
-      <EditInfoForm onSubmit={handleFormSubmit}>
+    <div className={twModal}>
+      <form className={twForm} onSubmit={handleFormSubmit}>
 
-        <FlexContainer>
-          <EditInfoTitle>Редактировать профиль</EditInfoTitle>
+        <div className={twFlexContainer}>
+          <h1 className={twTitle}>Редактировать профиль</h1>
 
-          <EditInfoLabel>Имя</EditInfoLabel>
-          <EditInfoInputField
+          <label className={twLabel}>Имя</label>
+          <input
+            className={twInput}
             value={nameText}
             onChange={(e) => setNameText(e.target.value)}
           />
 
-          <EditInfoLabel>Адрес профиля</EditInfoLabel>
-          <ProfileUrlContainer>
-            <ProfileUrlLeft>example.com/</ProfileUrlLeft>
-            <ProfileUrlRight
+          <label className={twLabel}>Адрес профиля</label>
+          <div className={twUrlContainer}>
+            <div className={twUrlLeft}>example.com/</div>
+            <input
+              className={twMerge(twInput, 'z-20 absolute mb-0 pl-[165px] bg-transparent')}  
               value={idForUrlText}
               onChange={(e) => setIdForUrlText(e.target.value)}
             />
-          </ProfileUrlContainer>
-        </FlexContainer>
+          </div>
+        </div>
 
-        <FlexContainer className="flex-grow">
-          <EditInfoLabel>Описание</EditInfoLabel>
-          <EditInfoTextArea
+        <div className={twMerge(twFlexContainer, 'flex-grow')}>
+          <label className={twLabel}>Описание</label>
+          <textarea
+            className={twTextArea}
             value={aboutText}
             onChange={(e) => setAboutText(e.target.value)}
           />
-        </FlexContainer>
+        </div>
         
-        <FlexContainer className="flex flex-row gap-[10px]">
-          <CancelButton type="button" light={true} onClick={close}>Отмена</CancelButton>
-          <SaveButton type="submit">Сохранить</SaveButton>
-        </FlexContainer>
+        <div className={twMerge(twFlexContainer, 'flex-row gap-[10px]')}>
+          <Button className="w-full" colors="light" size="big" onClick={close}>
+            Отмена
+          </Button>
+          <Button className="w-full" colors="dark" size="big" type="submit">
+            Сохранить
+          </Button>
+        </div>
 
-      </EditInfoForm>
-    </Modal>
+      </form>
+    </div>
   );
 
   const modalContainer = document.querySelector('#modal-container') as HTMLElement;
   return ReactDOM.createPortal(modal, modalContainer);
 }
 
-const Modal = tw.div`
+const twModal = twJoin(`
   z-50 min-h-screen w-full 
   flex flex-col justify-center
   font-inter
   pt-[80px] sm:pt-0
   items-start sm:items-center
   bg-transparent sm:bg-black/30 
-`;
+`);
 
-const EditInfoForm = tw.form`
+const twForm = twJoin(`
   px-[30px] py-[30px]
   flex flex-col
   bg-white
@@ -112,59 +119,45 @@ const EditInfoForm = tw.form`
   h-full sm:h-[580px] 
   flex-grow sm:flex-grow-0
   rounded-[0px] md:rounded-[5px]
-`;
+`);
 
-const FlexContainer = tw.div`
+const twFlexContainer = twJoin(`
   flex flex-col
-`;
+`);
 
-const EditInfoTitle = tw.h1`
+const twTitle = twJoin(`
   mb-[24px]
   font-medium leading-[42px] text-[30px]
-`;
+`);
 
-const EditInfoLabel = tw.label`
+const twLabel = twJoin(`
   mb-[4.5px]
   font-medium leading-[26px] text-[#838383]
-`;
+`);
 
-const EditInfoInputField = tw.input`
+const twInput = twJoin(`
   w-full h-[50px] mb-[15.5px] px-[19px] pt-0
   outline-none border rounded-[5px] border-[#D4D4D4]
   placeholder-[#838383] caret-black/70
   focus:border-[#838383]
-`;
+`);
 
-const ProfileUrlContainer = tw.div`
+const twUrlContainer = twJoin(`
   relative h-[50px] mb-[16px]
   flex flex-row items-center 
-`;
+`);
 
-const ProfileUrlLeft = tw.div`
+const twUrlLeft = twJoin(`
   z-10 absolute h-[50px] px-[19px] py-[12.5px] 
   bg-[#F3F3F3] text-[#838383] 
   border rounded-[5px] rounded-tr-none rounded-br-none border-r-[#D4D4D4]
-`;
+`);
 
-const ProfileUrlRight = tw(EditInfoInputField)`
-  z-20 absolute mb-0 pl-[165px]
-  bg-transparent
-`;
-
-const EditInfoTextArea = tw.textarea`
+const twTextArea = twJoin(`
   w-full px-[19px] py-3 mb-[25px]
   flex flex-grow 
   outline-none border rounded-[5px] border-[#D4D4D4]
   caret-black/70 leading-[26px]
   focus:border-[#838383]
   resize-none
-`;
-
-const CancelButton = tw(ButtonLarge)`
-  w-full
-`;
-
-const SaveButton = tw(ButtonLarge)`
-  w-full
-`;
-
+`);

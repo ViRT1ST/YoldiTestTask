@@ -1,10 +1,10 @@
-import tw from 'tailwind-styled-components';
+import { twJoin } from 'tailwind-merge';
 
-import Header from '@/components/yoldi-common/header';
-import Footer from '@/components/yoldi-common/footer';
 import { auth } from '@/lib/auth/next-auth';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 import type { UserWithExtraData } from '@/types';
+import Header from '@/components/yoldi-ui/header';
+import Footer from '@/components/yoldi-ui/footer';
 
 export const authConstants = {
   [LOGIN_STRING]: {
@@ -35,26 +35,26 @@ export default async function YoldiLayout({ children }: YoldiLayoutProps) {
   }
 
   return (
-    <Container>
+    <div className={twContainer}>
       <Header authConstants={authConstants} userData={userData} />
 
-      <Main>
+      <main className={twMain}>
         {children}
-      </Main>
+      </main>
 
       <Footer authConstants={authConstants} />
-    </Container>
+    </div>
   );
 }
 
-const Container = tw.div`
+const twContainer = twJoin(`
   w-full h-full min-h-screen
   flex flex-col
   font-inter
-`;
+`);
 
-const Main = tw.div`
+const twMain = twJoin(`
   flex-grow flex 
   bg-[#F3F3F3]
   bg-transparent xs:bg-[#F3F3F3]
-`;
+`);
