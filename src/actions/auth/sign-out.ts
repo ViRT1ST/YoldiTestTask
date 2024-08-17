@@ -9,6 +9,7 @@ export async function signOut() {
 export async function signOutWithRedirectToAuthPage() {
   return auth.signOut({
     redirectTo: '/yoldi/auth',
+    redirect: true,
   });
 }
 

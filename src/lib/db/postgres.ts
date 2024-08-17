@@ -11,6 +11,8 @@ const pool = new Pool({
   database: process.env.PG_DATABASE,
 });
 
+// type promiseObjectOrUndefined = Promise<AnyFieldsObject | undefined>;
+
 /* =============================================================
 All users
 ============================================================= */
@@ -31,18 +33,18 @@ async function getUserByUuid(
   return rows[0];
 }
 
-async function getUserByProfileUrl(
-  profileUrl: string
-): Promise<AnyFieldsObject | undefined> {
+
+
+async function getUserByAlias(alias: string): Promise<AnyFieldsObject | undefined> {
 
   const query = `
     SELECT *
     FROM users
-    WHERE profile_url_default = $1 OR profile_url_custom = $1
+    WHERE alias_default = $1 OR alias_custom = $1
     LIMIT 1
   `;
 
-  const { rows } = await pool.query(query, [profileUrl]);
+  const { rows } = await pool.query(query, [alias]);
 
   return rows[0];
 }
@@ -58,7 +60,7 @@ async function getUserByAuthEmail(
   const query = `
     SELECT *
     FROM users
-    WHERE LOWER(credentials_email) = LOWER($1)
+    WHERE LOWER(auth_email) = LOWER($1)
     LIMIT 1
   `;
 
@@ -74,7 +76,7 @@ async function createUserByAuthEmail(
   const hashedPassword = await bcrypt.hash(password, 8);
 
   const query = `
-    INSERT INTO users (default_provider, credentials_email, credentials_password, profile_name)
+    INSERT INTO users (default_auth_provider, auth_email, auth_password, name)
     VALUES ('credentials', $1, $2, $3)
     RETURNING *
   `;
@@ -109,7 +111,7 @@ async function createUserByAuthId(
 ): Promise<AnyFieldsObject | undefined | never> {
   
   const query = `
-    INSERT INTO users (default_provider, ${provider}_id, profile_name, profile_avatar)
+    INSERT INTO users (default_auth_provider, ${provider}_id, name, avatar)
     VALUES ($1, $2, $3, $4)
     RETURNING *
   `;
@@ -125,7 +127,7 @@ Update profile info
 async function updateProfile(
   data: any
 ): Promise<AnyFieldsObject | undefined | never> {
-  const { uuid, name, idForUrl, about } = data;
+  const { uuid, name, alias, about } = data;
 
   const paramsForSet: string[] = [];
   const paramsToPass: any[] = [uuid];
@@ -135,8 +137,8 @@ async function updateProfile(
     paramsToPass.push(value);
   };
 
-  name && addParam('profile_name', name);
-  idForUrl && addParam('profile_url_custom', idForUrl);
+  name && addParam('name', name);
+  alias && addParam('alias_custom', alias);
   about && addParam('profile_about', about);
   
   if (paramsToPass.length < 2) {
@@ -156,7 +158,7 @@ async function updateProfile(
 
 export default {
   getUserByUuid,
-  getUserByProfileUrl,
+  getUserByAlias,
   getUserByAuthEmail,
   createUserByAuthEmail,
   getUserByAuthId,

@@ -2,7 +2,7 @@
 
 import * as auth from '@/lib/auth/next-auth';
 
-const pathToAuthProcessor = '/yoldi/auth/pass';
+const PATH_TO_AUTH_PROCESSOR = '/yoldi/auth/pass';
 
 export async function redirectToAuthPage() {
   return auth.signIn();
@@ -17,7 +17,7 @@ export async function credetialsSignIn(additionalData: object, formData: FormDat
   };
 
   return auth.signIn('credentials', {
-    redirectTo: pathToAuthProcessor,
+    redirectTo: PATH_TO_AUTH_PROCESSOR,
     redirect: true,
     ...userData
   });
@@ -25,14 +25,14 @@ export async function credetialsSignIn(additionalData: object, formData: FormDat
 
 export async function githubSignIn() {
   return auth.signIn('github', {
-    redirectTo: pathToAuthProcessor,
+    redirectTo: PATH_TO_AUTH_PROCESSOR,
     redirect: true,
   });
 }
 
 export async function googleSignIn() {
   return auth.signIn('google', {
-    redirectTo: pathToAuthProcessor,
+    redirectTo: PATH_TO_AUTH_PROCESSOR,
     redirect: true,
   });
 }

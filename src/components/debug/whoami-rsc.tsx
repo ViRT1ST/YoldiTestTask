@@ -6,7 +6,7 @@ export default async function WhoAmIRSC() {
     headers: headers(),
   }).then((res) => res.json());
 
-  const name = user?.db_data?.profile_name || user?.name;
+  const name = user?.name;
 
   return (
     <div>Who Am I (RSC): {name}</div>

@@ -7,10 +7,9 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "populate": "node --trace-warnings lib/backend/populate/run.js"
+    "populate": "node --trace-warnings src/lib/db/populate.js"
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.4.0",
     "next": "14.2.5",

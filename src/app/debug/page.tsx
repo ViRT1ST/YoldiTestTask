@@ -8,13 +8,13 @@ export const metadata = {
   title: 'Debug Page',
 };
 
-export default async function TestPage() {
+export default async function DebugPage() {
   const session = await auth();
 
   async function onGetUserAction() {
     'use server';
     const session = await auth() as any;
-    return session?.user?.name || session?.user?.profile_name;
+    return session?.user?.name;
   }
 
   return (

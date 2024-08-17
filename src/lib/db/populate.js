@@ -14,18 +14,18 @@ const createUsersTable = `
   CREATE TABLE users (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     uuid UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
-    default_provider TEXT NOT NULL,
+    default_auth_provider TEXT NOT NULL,
     google_id TEXT DEFAULT NULL,
     github_id TEXT DEFAULT NULL,
-    credentials_email TEXT DEFAULT NULL,
-    credentials_password TEXT DEFAULT NULL,
-    profile_url_default TEXT UNIQUE NOT NULL GENERATED ALWAYS AS ('id'::TEXT || id::TEXT) STORED,
-    profile_url_custom TEXT DEFAULT NULL,
-    profile_name TEXT NOT NULL DEFAULT 'Anonymous',
-    profile_avatar TEXT DEFAULT NULL,
+    auth_email TEXT DEFAULT NULL,
+    auth_password TEXT DEFAULT NULL,
+    alias_default TEXT UNIQUE NOT NULL GENERATED ALWAYS AS ('id'::TEXT || id::TEXT) STORED,
+    alias_custom TEXT DEFAULT NULL,
+    name TEXT NOT NULL DEFAULT 'Anonymous',
+    avatar TEXT DEFAULT NULL,
     profile_cover TEXT DEFAULT NULL,
     profile_about TEXT DEFAULT NULL,
-    profile_email TEXT DEFAULT NULL,
+    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
@@ -35,12 +35,12 @@ const createUsersTable = `
 const addUsers = `
   INSERT INTO users (
     uuid,
-    default_provider,
+    default_auth_provider,
     google_id,
     github_id,
-    credentials_email,
-    credentials_password,
-    profile_name,
+    auth_email,
+    auth_password,
+    name,
     is_admin
   ) VALUES (
     '539560a8-9f98-46d3-8fb7-7806fec183c1',

@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth/next-auth';
 import Profile from '@/components/yoldi-profile/profile';
-import pg from '@/lib/backend/postgres';
-import type { UserWithExtraData, ProfileInfo } from '@/types';
+import pg from '@/lib/db/postgres';
+import type { SessionWithExtraData, ProfileInfo } from '@/types';
 import { redirect } from 'next/navigation';
 import { changeProfileInfo } from '@/actions';
 
@@ -17,10 +17,9 @@ const defaultAboutText = `
 `.replace(/\s+/g, ' ').trim();
 
 export default async function ProfilePage(context: any) {
-  const session = await auth();
-  const sessionUser = session?.user as UserWithExtraData;
-  const sessionProvider = sessionUser?.iss;
-  const sessionUuid = sessionUser?.db_data?.uuid;
+  const session = await auth() as SessionWithExtraData;
+  const sessionUser = session?.user;
+  const sessionUuid = sessionUser?.uuid;
 
   const slug = context?.params?.slug?.[0];
 
@@ -38,7 +37,7 @@ export default async function ProfilePage(context: any) {
   
   // db user is any user except "current", no matter if current session user exist
   if (slug !== 'me') {
-    dbUser = await pg.getUserByProfileUrl(slug as string);
+    dbUser = await pg.getUserByAlias(slug as string);
   }
 
   if (!dbUser) {
@@ -49,32 +48,34 @@ export default async function ProfilePage(context: any) {
     );
   }
 
-  const dataToPass: any = {
-    isAuthenticatedToEdit: sessionUuid === dbUser?.uuid,
-    uuid: dbUser.uuid,
-    avatar: dbUser.profile_avatar,
-    name: dbUser.profile_name,
-    profileUrl: dbUser.profile_url_custom || dbUser.profile_url_default,
-    cover: dbUser.profile_cover,
-    about: dbUser.profile_about || defaultAboutText,
+  const makeProviderStamp = (provider: string, authEmail: string) => {
+    let providerStamp = '';
+
+    switch (provider) {
+      case 'google':
+        providerStamp = 'Пользователь Google';
+        break;
+      case 'github':
+        providerStamp = 'Пользователь GitHub';
+        break;
+      case 'credentials':
+        providerStamp = authEmail || '';
+        break;
+    }
+
+    return providerStamp;
   };
 
-  const provider = sessionProvider || dbUser.default_provider;
-
-  switch (provider) {
-    case 'google':
-      dataToPass.providerStamp = 'Пользователь Google';
-      break;
-    case 'github':
-      dataToPass.providerStamp = 'Пользователь GitHub';
-      break;
-    case 'credentials':
-      dataToPass.providerStamp = dbUser.credentials_email;
-      break;
-    default:
-      dataToPass.providerStamp = 'N/A';
-      break;
-  }
+  const dataToPass: any = {
+    isAuthenticatedToEdit: sessionUuid === dbUser.uuid,
+    uuid: dbUser.uuid,
+    avatar: dbUser.avatar,
+    name: dbUser.name,
+    alias: dbUser.alias_custom || dbUser.alias_default,
+    cover: dbUser.profile_cover,
+    about: dbUser.profile_about || defaultAboutText,
+    providerStamp: makeProviderStamp(dbUser.default_auth_provider, dbUser.auth_email)
+  };
 
   return (
     <Profile data={dataToPass} onSaveData={changeProfileInfo} />

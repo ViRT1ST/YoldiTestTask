@@ -30,8 +30,8 @@ export default function Header({ userData, authConstants }: HeaderProps) {
 
   const isUserAuthenticated = Boolean(userData);
 
-  const userPicture = userData?.profile_avatar || null;
-  const userNameFull = userData?.profile_name || 'Anonymous';
+  const userPicture = userData?.avatar || null;
+  const userNameFull = userData?.name || 'Anonymous';
   const userNameShort = userNameFull.split(' ')[0];
   const userNameFirstLetter = userNameFull.charAt(0);
 

@@ -2,7 +2,7 @@ import { twJoin } from 'tailwind-merge';
 
 import { auth } from '@/lib/auth/next-auth';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
-import type { UserWithExtraData } from '@/types';
+import type { SessionWithExtraData } from '@/types';
 import Header from '@/components/yoldi-ui/header';
 import Footer from '@/components/yoldi-ui/footer';
 
@@ -25,18 +25,12 @@ interface YoldiLayoutProps {
 }
 
 export default async function YoldiLayout({ children }: YoldiLayoutProps) {
-  const session = await auth();
-  const sessionUser = session?.user as UserWithExtraData;
-
-  let userData: any = null;
-
-  if (sessionUser?.db_data) {
-    userData = sessionUser.db_data;
-  }
+  const session = await auth() as SessionWithExtraData;
+  const sessionUser = session?.user;
 
   return (
     <div className={twContainer}>
-      <Header authConstants={authConstants} userData={userData} />
+      <Header authConstants={authConstants} userData={sessionUser || null} />
 
       <main className={twMain}>
         {children}

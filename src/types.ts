@@ -47,28 +47,37 @@ export type AuthFormData = {
   isRegistrationPage: boolean,
 }
 
-export type UserWithExtraData = User & ({
-  provider_data?: {
+export type SessionWithExtraData = ({
+  iss?: string;
+  user?: {
+    iss?: string;
+    uuid?: string;
+    avatar?: string | null;
+    alias?: string;
     name?: string;
-    email?: string;
-    password?: string;
-    callbackUrl?: string;
-    formUrl?: string;
-    sub: string,
-    picture: string;
-    login: string;
-    id: number;
-    avatar_url: string;
-  },
-  db_data: {
-    uuid: string,
-    profile_avatar: string | null,
-    profile_url: string,
-    profile_name: string,
-    is_admin: boolean
-  }
-  iss?: string
-}) | undefined;
+    is_admin?: boolean
+    provider_data?: {
+      name?: string;
+      email?: string;
+      password?: string;
+      callbackUrl?: string;
+      formUrl?: string;
+      sub?: string,
+      picture?: string;
+      login?: string;
+      id?: number;
+      avatar_url?: string;
+    },
+    user_replace_data?: {
+      iss: string;
+      uuid: string;
+      avatar: string | null;
+      alias: string;
+      name: string;
+      is_admin: boolean
+    }
+  } | undefined | null;
+}) | undefined | null;
 
 export type AuthConstants = {
   [REGISTRATION_STRING]: {
@@ -86,6 +95,6 @@ export type AuthConstants = {
 
 export type ProfileInfo = {
   name: string,
-  idForUrl: string,
+  alias: string,
   about: string
 }

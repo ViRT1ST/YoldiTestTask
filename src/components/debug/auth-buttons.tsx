@@ -12,7 +12,7 @@ import {
 export default function AuthButtons() {
   const session = useSession() as any;
   const user = session?.data?.user;
-  const name = user?.db_data?.profile_name || user?.name;
+  const name = user?.name;
 
   return (
     <div className="mb-20">

@@ -5,24 +5,23 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { auth, signOut, unstable_update} from '@/lib/auth/next-auth';
-import validator from '@/lib/backend/validator';
-import pg from '@/lib/backend/postgres';
-import type { UserWithExtraData } from '@/types';
 import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
+import { ExtendedError } from '@/errors';
+import type { SessionWithExtraData } from '@/types';
+import pg from '@/lib/db/postgres';
 
 const defaultError = { message: 'Failed to authenticate', code: 401 };
 
 export async function authorizeUser() {
-  const session = await auth();
-  const sessionUser = session?.user as UserWithExtraData;
+  const session = await auth() as SessionWithExtraData;
+  const providerData = session?.user?.provider_data;
+  const authProvider = session?.user?.iss;
 
-  if (!sessionUser?.provider_data) {
+  if (!providerData) {
     return signOut({
       redirectTo: `/yoldi/auth?error=${defaultError.message}&code=${defaultError.code}`
     });
   }
-
-  const authProvider = sessionUser?.iss;
 
   let isRegistrationPage = false;
   let authError: any = null;
@@ -34,7 +33,7 @@ export async function authorizeUser() {
 
   if (authProvider === 'credentials') {
     try {
-      const { name, email, password, formUrl } = sessionUser.provider_data;
+      const { name, email, password, formUrl } = providerData;
 
       if (typeof formUrl === 'string' && formUrl.includes('method=registration')) {
         isRegistrationPage = true;
@@ -60,7 +59,7 @@ export async function authorizeUser() {
         // Throw error if validation fails
         if (!result.success) {
           const errorMessages = convertErrorZodResultToMsgArray(result);
-          validator.throwError(400, errorMessages.join(' | '));
+          throw new ExtendedError(400, errorMessages.join(' | '));
 
         // Process user credentials
         } else {
@@ -69,7 +68,7 @@ export async function authorizeUser() {
           // Found existing user -> throw error
           // User not found -> new user registration
           if (dbUser) {
-            validator.throwError(400, 'User already exists');
+            throw new ExtendedError(400, 'User already exists');
 
           } else {
             dbUser = await pg.createUserByAuthEmail(
@@ -79,7 +78,7 @@ export async function authorizeUser() {
             );
 
             if (!dbUser) {
-              validator.throwError(400, 'Error creating new user');
+              throw new ExtendedError(400, 'Error creating new user');
             }
           }
         }
@@ -102,23 +101,23 @@ export async function authorizeUser() {
         // Throw error if validation fails
         if (!result.success) {
           const errorMessages = convertErrorZodResultToMsgArray(result);
-          validator.throwError(400, errorMessages.join(' | '));
-        
+          throw new ExtendedError(400, errorMessages.join(' | '));
+
         // Process user credentials
         } else {
           dbUser = await pg.getUserByAuthEmail(email as string);
 
           if (!dbUser) {
-            validator.throwError(400, 'User not found');
+            throw new ExtendedError(400, 'User not found');
 
           } else {
             const match = await bcrypt.compare(
               password as string,
-              dbUser.credentials_password
+              dbUser.auth_password
             );
 
             if (!match) {
-              validator.throwError(400, 'Password is invalid');
+              throw new ExtendedError(400, 'Password is invalid');
             }
           }
         }
@@ -136,7 +135,7 @@ export async function authorizeUser() {
   OAuth authorization passing
   ============================================================= */
 
-  const changeGoogleAvatarSize = (imageUrl: string) => {
+  const changeGoogleAvatarSize = (imageUrl: any) => {
     return typeof imageUrl === 'string'
       ? imageUrl.replace('w=s96-c', 'w=s512-c')
       : imageUrl;
@@ -147,21 +146,24 @@ export async function authorizeUser() {
     let userName = null;
     let userAvatar = null;
 
+    const { sub, name, picture, id, login, avatar_url } = providerData;
+
     switch (authProvider) {
       case 'google':
-        userId = sessionUser.provider_data?.sub;
-        userName = sessionUser.provider_data?.name;
-        userAvatar = changeGoogleAvatarSize(sessionUser.provider_data?.picture);
+        userId = sub;
+        userName = name;
+        userAvatar = changeGoogleAvatarSize(picture);
         break;
       case 'github':
-        userId = String(sessionUser.provider_data?.id);
-        userName = sessionUser.provider_data?.login;
-        userAvatar = sessionUser.provider_data?.avatar_url;
+        userId = String(id);
+        userName = login;
+        userAvatar = avatar_url;
         break;
     }
+
     if (!userId || !userName || !userAvatar) {
       const msgIss = authProvider.charAt(0).toUpperCase() + authProvider.slice(1);
-      validator.throwError(400, `Invalid user info from your ${msgIss} account`);
+      throw new ExtendedError(400, `Invalid user info from your ${msgIss} account`);
 
     } else {
       try {
@@ -171,7 +173,7 @@ export async function authorizeUser() {
           dbUser = await pg.createUserByAuthId(authProvider, userId, userName, userAvatar);
 
           if (!dbUser) {
-            validator.throwError(400, 'Error creating new user');
+            throw new ExtendedError(400, 'Error creating new user');
           }
         }
 
@@ -191,17 +193,18 @@ export async function authorizeUser() {
   if (!authError && dbUser) {
     await unstable_update({
       user: {
-        name: dbUser.profile_name,
-        email: null,
-        sub: null,
-        picture: null,
-        provider_data: null,
-        db_data: {
+        // name: null,
+        // email: null,
+        // sub: null,
+        // picture: null,
+        // provider_data: null,
+        user_replace_data: {
           uuid: dbUser.uuid,
-          profile_avatar: dbUser.profile_avatar,
-          profile_url: dbUser.profile_url_custom || dbUser.profile_url_default,
-          profile_name: dbUser.profile_name,
+          avatar: dbUser.avatar,
+          alias: dbUser.alias_custom || dbUser.alias_default,
+          name: dbUser.name,
           is_admin: dbUser.is_admin,
+          iss: authProvider
         }
       } as any
     });

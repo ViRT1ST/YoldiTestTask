@@ -14,10 +14,10 @@ interface ProfileModalProps {
 }
 
 export default function ProfileModal({ isOpen, data, onSaveData, close }: ProfileModalProps) {
-  const { name, profileUrl, about } = data;
+  const { name, alias, about } = data;
 
   const [nameText, setNameText] = useState(name);
-  const [idForUrlText, setIdForUrlText] = useState(profileUrl);
+  const [aliasText, setAliasText] = useState(alias);
   const [aboutText, setAboutText] = useState(about);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function ProfileModal({ isOpen, data, onSaveData, close }: Profil
     close();
     onSaveData({
       name: nameText,
-      idForUrl: idForUrlText,
+      alias: aliasText,
       about: aboutText
     });
     // window.location.reload();
@@ -70,8 +70,8 @@ export default function ProfileModal({ isOpen, data, onSaveData, close }: Profil
             <div className={twUrlLeft}>example.com/</div>
             <input
               className={twMerge(twInput, 'z-20 absolute mb-0 pl-[165px] bg-transparent')}  
-              value={idForUrlText}
-              onChange={(e) => setIdForUrlText(e.target.value)}
+              value={aliasText}
+              onChange={(e) => setAliasText(e.target.value)}
             />
           </div>
         </div>

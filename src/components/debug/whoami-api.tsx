@@ -9,7 +9,7 @@ export default function WhoAmIAPI() {
     fetch('/api/debug')
       .then((res) => res.json())
       .then(({ user }) => {
-        setName(user?.db_data?.profile_name || user?.name);
+        setName(user?.name);
       });
   }, []);
   
