@@ -8,7 +8,7 @@ import { auth, unstable_update  } from '@/lib/auth/next-auth';
 import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
 import { ExtendedError } from '@/errors';
 import type { ProfileInfo, SessionWithExtraData } from '@/types';
-import pg from '@/lib/db/postgres';
+import dbQueries from '@/lib/db/queries';
 
 export async function changeProfileInfo(data: ProfileInfo) {
   const session = await auth() as SessionWithExtraData;
@@ -52,7 +52,7 @@ export async function changeProfileInfo(data: ProfileInfo) {
         const fixedAbout = about.replace(/\s+/g, ' ');
         const fixedAlias = alias.toLowerCase();
 
-        await pg.updateProfile({
+        await dbQueries.updateProfile({
           uuid: sessionUuid,
           name: name,
           alias: fixedAlias,
@@ -61,7 +61,7 @@ export async function changeProfileInfo(data: ProfileInfo) {
 
         await unstable_update({
           user: {
-            user_replace_data: {
+            replace_data: {
               ...sessionUser,
               name: name || sessionUser?.name,
               alias: fixedAlias || sessionUser?.alias

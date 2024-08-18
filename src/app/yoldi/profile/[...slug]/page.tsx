@@ -1,9 +1,16 @@
 import { auth } from '@/lib/auth/next-auth';
-import Profile from '@/components/yoldi-profile/profile';
-import pg from '@/lib/db/postgres';
-import type { SessionWithExtraData, ProfileInfo } from '@/types';
 import { redirect } from 'next/navigation';
 import { changeProfileInfo } from '@/actions';
+import Profile from '@/components/yoldi-profile/profile';
+import dbQueries from '@/lib/db/queries';
+
+import type {
+  SessionWithExtraData, 
+  DbUser,
+  DbUserOrUndef,
+  AnyFieldsObject,
+  OauthProviders
+} from '@/types';
 
 export const metadata = {
   title: 'Yoldi Profile Page',
@@ -23,21 +30,21 @@ export default async function ProfilePage(context: any) {
 
   const slug = context?.params?.slug?.[0];
 
-  let dbUser: any = null;
-
   // redirect if user is not logged and wants to access "current" user profile
   if (slug === 'me' && !sessionUuid) {
     redirect('/yoldi/auth');
   }
 
+  let dbUser: DbUserOrUndef;
+
   // db user is same as in session
   if (slug === 'me' && sessionUuid) {
-    dbUser = await pg.getUserByUuid(sessionUuid as string);
+    dbUser = await dbQueries.getUserByUuid(sessionUuid as string);
   }
   
   // db user is any user except "current", no matter if current session user exist
   if (slug !== 'me') {
-    dbUser = await pg.getUserByAlias(slug as string);
+    dbUser = await dbQueries.getUserByAlias(slug as string);
   }
 
   if (!dbUser) {

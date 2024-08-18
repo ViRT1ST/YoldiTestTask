@@ -1,14 +1,7 @@
-require('dotenv').config();
+import { Client } from 'pg';
+import { PG_CONFIG } from './config';
 
-const { Client } = require('pg');
-
-const client = new Client({
-  host: process.env.PG_HOST,
-  port: 5432,
-  user: process.env.PG_USER,
-  password: process.env.PG_PASSWORD,
-  database: process.env.PG_DATABASE,
-});
+const client = new Client(PG_CONFIG);
 
 const createUsersTable = `
   CREATE TABLE users (
@@ -81,13 +74,10 @@ const addUsers = `
   );
 `;
 
-
 async function run() {
   await client.connect();
-
   await client.query(createUsersTable);
   await client.query(addUsers);
-
   await client.end();
 }
 

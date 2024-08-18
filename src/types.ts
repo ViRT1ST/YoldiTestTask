@@ -1,25 +1,30 @@
-import { User } from 'next-auth';
-import { z } from 'zod';
-
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 
 /* =============================================================
 Database Schemas And Types
 ============================================================= */
 
-export const DbUserSchema = z.object({
-  id: z.number(),
-  uuid: z.string(),
-  email: z.string(),
-  email_lowercase: z.string(),
-  username: z.string(),
-  password: z.string(),
-  is_admin: z.boolean(),
-  created_at: z.date(),
-  updated_at: z.date(),
-});
+export type DbUser = {
+  id: number;
+  uuid: string;
+  default_auth_provider: string;
+  google_id: string;
+  github_id: string;
+  auth_email: string;
+  auth_password: string;
+  alias_default: string;
+  alias_custom: string;
+  name: string;
+  avatar: string;
+  profile_cover: string;
+  profile_about: string;
+  is_verified: boolean;
+  is_admin: boolean;
+  created_at: Date;
+  updated_at: Date;
+};
 
-export type DbUser = z.infer<typeof DbUserSchema>;
+export type DbUserOrUndef = DbUser | undefined;
 
 /* =============================================================
 Other Types
@@ -48,13 +53,15 @@ export type AuthFormData = {
 }
 
 export type SessionWithExtraData = ({
-  iss?: string;
   user?: {
+    iat?: number;
+    exp?: number;
+    jti?: string;
     iss?: string;
     uuid?: string;
+    name?: string;
     avatar?: string | null;
     alias?: string;
-    name?: string;
     is_admin?: boolean
     provider_data?: {
       name?: string;
@@ -68,12 +75,12 @@ export type SessionWithExtraData = ({
       id?: number;
       avatar_url?: string;
     },
-    user_replace_data?: {
+    replace_data?: {
       iss: string;
       uuid: string;
+      name: string;
       avatar: string | null;
       alias: string;
-      name: string;
       is_admin: boolean
     }
   } | undefined | null;
@@ -98,3 +105,4 @@ export type ProfileInfo = {
   alias: string,
   about: string
 }
+

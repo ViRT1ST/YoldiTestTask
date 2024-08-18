@@ -61,8 +61,7 @@ const authOptions: NextAuthConfig = {
       }
 
       if (trigger === 'update' && session) {
-        // token = { ...token, ...session.user };
-        token = { ...session.user.user_replace_data };
+        token = { ...session.user.replace_data };
       };
 
       return token;

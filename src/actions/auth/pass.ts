@@ -8,7 +8,7 @@ import { auth, signOut, unstable_update} from '@/lib/auth/next-auth';
 import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
 import { ExtendedError } from '@/errors';
 import type { SessionWithExtraData } from '@/types';
-import pg from '@/lib/db/postgres';
+import dbQueries from '@/lib/db/queries';
 
 const defaultError = { message: 'Failed to authenticate', code: 401 };
 
@@ -63,7 +63,7 @@ export async function authorizeUser() {
 
         // Process user credentials
         } else {
-          dbUser = await pg.getUserByAuthEmail(email as string);
+          dbUser = await dbQueries.getUserByAuthEmail(email as string);
 
           // Found existing user -> throw error
           // User not found -> new user registration
@@ -71,7 +71,7 @@ export async function authorizeUser() {
             throw new ExtendedError(400, 'User already exists');
 
           } else {
-            dbUser = await pg.createUserByAuthEmail(
+            dbUser = await dbQueries.createUserByAuthEmail(
               email as string,
               password as string,
               name as string
@@ -105,7 +105,7 @@ export async function authorizeUser() {
 
         // Process user credentials
         } else {
-          dbUser = await pg.getUserByAuthEmail(email as string);
+          dbUser = await dbQueries.getUserByAuthEmail(email as string);
 
           if (!dbUser) {
             throw new ExtendedError(400, 'User not found');
@@ -167,10 +167,10 @@ export async function authorizeUser() {
 
     } else {
       try {
-        dbUser = await pg.getUserByAuthId(authProvider, userId);
+        dbUser = await dbQueries.getUserByAuthId(authProvider, userId);
 
         if (!dbUser) {
-          dbUser = await pg.createUserByAuthId(authProvider, userId, userName, userAvatar);
+          dbUser = await dbQueries.createUserByAuthId(authProvider, userId, userName, userAvatar);
 
           if (!dbUser) {
             throw new ExtendedError(400, 'Error creating new user');
@@ -198,7 +198,7 @@ export async function authorizeUser() {
         // sub: null,
         // picture: null,
         // provider_data: null,
-        user_replace_data: {
+        replace_data: {
           uuid: dbUser.uuid,
           avatar: dbUser.avatar,
           alias: dbUser.alias_custom || dbUser.alias_default,

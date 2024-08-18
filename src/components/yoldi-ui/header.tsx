@@ -3,6 +3,7 @@
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { twJoin } from 'tailwind-merge';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 import { AuthConstants } from '@/types';
@@ -48,7 +49,9 @@ export default function Header({ userData, authConstants }: HeaderProps) {
 
       <div className={twLogoArea}>
         <div className={twLogoContainer}>
+        <Link href="/yoldi">
           <HeaderLogo />
+        </Link>
         </div>
         <div className={twTextForLogo}>
           Разрабатываем и запускаем<br />сложные веб проекты

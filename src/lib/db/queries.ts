@@ -1,15 +1,10 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 
-import { AnyFieldsObject, OauthProviders } from '@/types';
+import type { DbUser, DbUserOrUndef, AnyFieldsObject, OauthProviders } from '@/types';
+import { PG_CONFIG } from './config';
 
-const pool = new Pool({
-  host: process.env.PG_HOST,
-  port: 5432,
-  user: process.env.PG_USER,
-  password: process.env.PG_PASSWORD,
-  database: process.env.PG_DATABASE,
-});
+const pool = new Pool(PG_CONFIG);
 
 // type promiseObjectOrUndefined = Promise<AnyFieldsObject | undefined>;
 
@@ -17,10 +12,7 @@ const pool = new Pool({
 All users
 ============================================================= */
 
-async function getUserByUuid(
-  uuid: string
-): Promise<AnyFieldsObject | undefined> {
-
+async function getUserByUuid(uuid: string): Promise<DbUserOrUndef> {
   const query = `
     SELECT *
     FROM users
@@ -33,10 +25,7 @@ async function getUserByUuid(
   return rows[0];
 }
 
-
-
-async function getUserByAlias(alias: string): Promise<AnyFieldsObject | undefined> {
-
+async function getUserByAlias(alias: string): Promise<DbUserOrUndef> {
   const query = `
     SELECT *
     FROM users
@@ -53,10 +42,7 @@ async function getUserByAlias(alias: string): Promise<AnyFieldsObject | undefine
 Users with authentication by email and password
 ============================================================= */
 
-async function getUserByAuthEmail(
-  email: string
-): Promise<AnyFieldsObject | undefined | never> {
-
+async function getUserByAuthEmail(email: string): Promise<DbUserOrUndef> {
   const query = `
     SELECT *
     FROM users
@@ -71,16 +57,14 @@ async function getUserByAuthEmail(
 
 async function createUserByAuthEmail(
   email: string, password: string, profileName: string = 'Anonymous'
-): Promise<AnyFieldsObject | undefined | never> {
-  
-  const hashedPassword = await bcrypt.hash(password, 8);
-
+): Promise<DbUserOrUndef> {
   const query = `
     INSERT INTO users (default_auth_provider, auth_email, auth_password, name)
     VALUES ('credentials', $1, $2, $3)
     RETURNING *
   `;
   
+  const hashedPassword = await bcrypt.hash(password, 8);
   const { rows } = await pool.query(query, [email, hashedPassword, profileName]);
 
   return rows[0];
@@ -90,10 +74,7 @@ async function createUserByAuthEmail(
 Users with authentication by third party auth providers
 ============================================================= */
 
-async function getUserByAuthId(
-  provider: OauthProviders, id: string
-): Promise<AnyFieldsObject | undefined | never> {
-
+async function getUserByAuthId(provider: OauthProviders, id: string): Promise<DbUserOrUndef> {
   const query = `
     SELECT *
     FROM users
@@ -108,8 +89,7 @@ async function getUserByAuthId(
 
 async function createUserByAuthId(
   provider: OauthProviders, id: string, name: string = 'Anonymous', avatar: string
-): Promise<AnyFieldsObject | undefined | never> {
-  
+): Promise<DbUserOrUndef> {
   const query = `
     INSERT INTO users (default_auth_provider, ${provider}_id, name, avatar)
     VALUES ($1, $2, $3, $4)
@@ -124,9 +104,7 @@ async function createUserByAuthId(
 Update profile info
 ============================================================= */
 
-async function updateProfile(
-  data: any
-): Promise<AnyFieldsObject | undefined | never> {
+async function updateProfile(data: any): Promise<DbUserOrUndef> {
   const { uuid, name, alias, about } = data;
 
   const paramsForSet: string[] = [];
@@ -156,7 +134,7 @@ async function updateProfile(
   return rows[0];
 }
 
-export default {
+const dbQueries = {
   getUserByUuid,
   getUserByAlias,
   getUserByAuthEmail,
@@ -166,4 +144,4 @@ export default {
   updateProfile
 };
 
-
+export default dbQueries;

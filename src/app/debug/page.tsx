@@ -11,12 +11,6 @@ export const metadata = {
 export default async function DebugPage() {
   const session = await auth();
 
-  async function onGetUserAction() {
-    'use server';
-    const session = await auth() as any;
-    return session?.user?.name;
-  }
-
   return (
     <main className="px-10">
       <h1 className="text-3xl my-2">Debug Page</h1>
