@@ -1,12 +1,10 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 
-import type { DbUser, DbUserOrUndef, AnyFieldsObject, OauthProviders } from '@/types';
+import type { DbUserOrUndef, OauthProviders } from '@/types';
 import { PG_CONFIG } from './config';
 
 const pool = new Pool(PG_CONFIG);
-
-// type promiseObjectOrUndefined = Promise<AnyFieldsObject | undefined>;
 
 /* =============================================================
 All users
@@ -21,7 +19,6 @@ async function getUserByUuid(uuid: string): Promise<DbUserOrUndef> {
   `;
 
   const { rows } = await pool.query(query, [uuid]);
-
   return rows[0];
 }
 
@@ -33,8 +30,9 @@ async function getUserByAlias(alias: string): Promise<DbUserOrUndef> {
     LIMIT 1
   `;
 
-  const { rows } = await pool.query(query, [alias]);
+  const lowerAlias = alias.toLowerCase();
 
+  const { rows } = await pool.query(query, [lowerAlias]);
   return rows[0];
 }
 
@@ -51,7 +49,6 @@ async function getUserByAuthEmail(email: string): Promise<DbUserOrUndef> {
   `;
 
   const { rows } = await pool.query(query, [email]);
-
   return rows[0];
 }
 
@@ -65,8 +62,8 @@ async function createUserByAuthEmail(
   `;
   
   const hashedPassword = await bcrypt.hash(password, 8);
-  const { rows } = await pool.query(query, [email, hashedPassword, profileName]);
 
+  const { rows } = await pool.query(query, [email, hashedPassword, profileName]);
   return rows[0];
 }
 
@@ -83,7 +80,6 @@ async function getUserByAuthId(provider: OauthProviders, id: string): Promise<Db
   `;
 
   const { rows } = await pool.query(query, [id]);
-
   return rows[0];
 }
 
@@ -104,7 +100,7 @@ async function createUserByAuthId(
 Update profile info
 ============================================================= */
 
-async function updateProfile(data: any): Promise<DbUserOrUndef> {
+async function updateProfileInfo(data: any): Promise<DbUserOrUndef> {
   const { uuid, name, alias, about } = data;
 
   const paramsForSet: string[] = [];
@@ -116,7 +112,7 @@ async function updateProfile(data: any): Promise<DbUserOrUndef> {
   };
 
   name && addParam('name', name);
-  alias && addParam('alias_custom', alias);
+  alias && addParam('alias_custom', alias.toLowerCase());
   about && addParam('profile_about', about);
   
   if (paramsToPass.length < 2) {
@@ -130,7 +126,39 @@ async function updateProfile(data: any): Promise<DbUserOrUndef> {
   `;
 
   const { rows } = await pool.query(query, paramsToPass);
+  return rows[0];
+}
 
+async function changeProfileCover(uuid: string, imageUrl: string): Promise<DbUserOrUndef> {
+  const query = `
+    UPDATE users
+    SET profile_cover = $2
+    WHERE uuid = $1
+  `;
+
+  const { rows } = await pool.query(query, [uuid, imageUrl]);
+  return rows[0];
+}
+
+async function deleteProfileCover(uuid: string): Promise<DbUserOrUndef> {
+  const query = `
+    UPDATE users
+    SET profile_cover = NULL
+    WHERE uuid = $1
+  `;
+
+  const { rows } = await pool.query(query, [uuid]);
+  return rows[0];
+}
+
+async function changeProfileAvatar(uuid: string, imageUrl: string): Promise<DbUserOrUndef> {
+  const query = `
+    UPDATE users
+    SET avatar = $2
+    WHERE uuid = $1
+  `;
+
+  const { rows } = await pool.query(query, [uuid, imageUrl]);
   return rows[0];
 }
 
@@ -141,7 +169,10 @@ const dbQueries = {
   createUserByAuthEmail,
   getUserByAuthId,
   createUserByAuthId,
-  updateProfile
+  updateProfileInfo,
+  changeProfileCover,
+  deleteProfileCover,
+  changeProfileAvatar
 };
 
 export default dbQueries;

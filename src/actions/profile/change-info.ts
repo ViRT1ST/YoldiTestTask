@@ -15,7 +15,7 @@ export async function changeProfileInfo(data: ProfileInfo) {
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 
-  let authError: any = null;
+  let returnError: any = null;
 
   if (sessionUuid) {
     const updateInfoSchema = z.object({
@@ -52,7 +52,13 @@ export async function changeProfileInfo(data: ProfileInfo) {
         const fixedAbout = about.replace(/\s+/g, ' ');
         const fixedAlias = alias.toLowerCase();
 
-        await dbQueries.updateProfile({
+        // Find user with same custom alias
+        const userWithSameAlias = await dbQueries.getUserByAlias(fixedAlias);
+        if (userWithSameAlias?.alias_custom) {
+          throw new ExtendedError(400, 'URL alias already in use');
+        }
+
+        await dbQueries.updateProfileInfo({
           uuid: sessionUuid,
           name: name,
           alias: fixedAlias,
@@ -71,18 +77,18 @@ export async function changeProfileInfo(data: ProfileInfo) {
       }
       
     } catch (error: any) {
-      authError = {
+      returnError = {
         message: error?.message || 'Unknown error',
         code: error?.code || 500
       };
     }
   }
 
-  const error = authError?.message;
-  const code = authError?.code;
+  const message = returnError?.message;
+  const code = returnError?.code;
 
-  const redirectUrl = error && code
-    ? `/yoldi/profile?error=${error}&code=${code}`
+  const redirectUrl = message && code
+    ? `/yoldi/profile?error=${message}&code=${code}`
     : `/yoldi/profile`;
 
   redirect(redirectUrl);

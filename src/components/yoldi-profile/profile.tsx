@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { signOutWithRedirectToAuthPage } from '@/actions';
+import * as actions from '@/actions';
 import { toast } from 'react-toastify';
 import { twMerge, twJoin } from 'tailwind-merge';
+
 import Image from 'next/image';
 
 import {
@@ -12,7 +13,9 @@ import {
   LogoutIcon,
   UploadUpIcon,
   UploadImageIcon,
-  UploadTrashIcon
+  UploadTrashIcon,
+  PhotoIcon,
+  LoadingIcon
 } from '@/components/yoldi-ui/icons';
 import Button from '@/components/yoldi-ui/button';
 import ProfileModal from '@/components/yoldi-profile/profile-modal';
@@ -39,15 +42,18 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [errorMsg, setErrorMsg] = useState(searchParams.get('error') || null);
-
   const { isAuthenticatedToEdit, providerStamp, name, avatar, cover, about } = data;
   const nameFirstLetter = name.charAt(0) as string;
+  const isCoverExist = !!cover;
 
-  const [isCoverExist, setIsCoverExist] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(searchParams.get('error') || null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCoverChangeInProcess, setIsCoverChangeInProcess] = useState(false);
+  const [isAvatarChangeInProcess, setIsAvatarChangeInProcess] = useState(false);
 
-  const hiddenFileInputRef = useRef<HTMLInputElement>(null);
+  const coverFileInputRef = useRef<HTMLInputElement>(null);
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
 
   const changeCoverButtonData = isCoverExist
     ? changeCoverData.remove
@@ -55,21 +61,50 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
 
   useEffect(() => {
     if (errorMsg) {
-      router.push('/yoldi/profile/me');
+      // hide url params after error
+      router.push('/yoldi/profile/me'); 
       toast.error(errorMsg);
     }
 
     setTimeout(() => setErrorMsg(null), 10000);
   }, [errorMsg]);
 
-  const inputFileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const hasFile = Boolean(e.target.files?.length);
-    // upload image
-    setIsCoverExist(!isCoverExist);
+  const coverChangeHandler = () => {
+    if (isCoverExist) {
+      // server action to remove cover
+      setIsCoverChangeInProcess(true);
+      actions.deleteProfileCover();
+    } else {
+      coverFileInputRef.current?.click();
+    }
   };
 
-  const coverEditHandler = () => {
-    hiddenFileInputRef.current?.click();
+  const coverInputFileHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const image = e.target.files?.[0];
+
+    // server action to upload image and update cover
+    if (image) {
+      setIsCoverChangeInProcess(true);
+      const formData = new FormData();
+      formData.append('file', image);
+      actions.changeProfileCover(formData);
+    }
+  };
+
+  const avatarChangeHandler = () => {
+    avatarFileInputRef.current?.click();
+  };
+
+  const avatarInputFileHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const image = e.target.files?.[0];
+
+    // server action to upload image and update cover
+    if (image) {
+      setIsAvatarChangeInProcess(true);
+      const formData = new FormData();
+      formData.append('file', image);
+      actions.changeProfileAvatar(formData);
+    }
   };
 
   return (
@@ -81,34 +116,49 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
         close={() => setIsModalOpen(false)}
       />
 
-      <div className={twCoverContainer}>
+      <div className={twCoverContainer} style={cover && { backgroundImage: `url(${cover})` }}>
         {isAuthenticatedToEdit && (
           <>
             <input
-              ref={hiddenFileInputRef}
+              ref={coverFileInputRef}
               className="hidden"
-              onChange={(e) => inputFileChangeHandler(e)}
+              onChange={(e) => coverInputFileHandler(e)}
               type="file"
               accept="image/png, image/jpeg"
+              name="file"
             />
 
-            <Button
-              className="pl-[26px] bg-white opacity-100 group-hover:opacity-100"
-              title={''}
-              colors="light"
-              size="normal"
-              onClick={coverEditHandler}
-            >
-              <span className={twMerge(twSvgContainer, 'w-5 px-0 pl-0')}>
-                {changeCoverButtonData.actionIcon}
-              </span>
-              <span>
-                {changeCoverButtonData.buttonText}
-              </span>
-              <span className={twMerge(twSvgContainer, 'w-[26px] pt-[3px]')}>
-                <UploadImageIcon />
-              </span>
-            </Button>
+            {isCoverChangeInProcess ? (
+              <Button
+                title=""
+                colors="light"
+                size="normal"
+                disabled
+              >
+                {'Изменение обложки...'}
+              </Button>
+            ) : (
+              <Button
+                className="pl-[26px] bg-white opacity-0 group-hover:opacity-100"
+                title=""
+                colors="light"
+                size="normal"
+                onClick={coverChangeHandler}
+              >
+                <span className={twMerge(twSvgContainer, 'w-5 px-0 pl-0')}>
+                  {changeCoverButtonData.actionIcon}
+                </span>
+                <span>
+                  {
+                    isCoverChangeInProcess && 'Изменение...' ||
+                    changeCoverButtonData.buttonText
+                  }
+                </span>
+                <span className={twMerge(twSvgContainer, 'w-[26px] pt-[3px]')}>
+                  <UploadImageIcon />
+                </span>
+              </Button>
+            )}
           </>
         )}
       </div>
@@ -117,20 +167,48 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
         <div className={twInfoLimiter}>
 
           <div className={twUserAvatarContainer}>
-            {avatar ? (
-              <Image
-                src={avatar}
-                alt={name}
-                className="h-full w-full"
-                width={0}
-                height={0}
-                sizes="100vw"
-                priority={true}
-              /> 
+            {isAvatarChangeInProcess ? (
+              <span className={twUserAvatarLoadingIcon}>
+                <LoadingIcon />
+              </span>
             ) : (
-              <div className={twNameFirstLetter}>
-                {nameFirstLetter}
-              </div>
+              avatar ? (
+                <Image
+                  src={avatar}
+                  alt={name}
+                  className="h-full w-full"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  priority={true}
+                /> 
+              ) : (
+                <span className={twNameFirstLetter}>
+                  {nameFirstLetter}
+                </span>
+              )
+            )}
+
+            {isAuthenticatedToEdit && (
+              <>
+                <input
+                  ref={avatarFileInputRef}
+                  className="hidden"
+                  onChange={(e) => avatarInputFileHandler(e)}
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  name="file"
+                />
+
+                <button
+                  className={twUserAvatarPhotoIconButton}
+                  onClick={avatarChangeHandler}
+                >
+                  <span className={'w-full h-full flex justify-center items-center'}>
+                    <PhotoIcon />
+                  </span>
+                </button>
+              </>
             )}
           </div>
 
@@ -173,7 +251,7 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
                 className="mt-[59.5px]"
                 colors="light"
                 size="normal"
-                onClick={() => signOutWithRedirectToAuthPage()}
+                onClick={() => actions.signOutWithRedirectToAuthPage()}
               >
                 <span className={twSvgContainer}>
                   <LogoutIcon />
@@ -215,7 +293,7 @@ const twCoverContainer = twJoin(`
   h-[200px]
   flex justify-center items-center
   bg-[#F3F3F3] border-b border-[#E6E6E6] 
-  group
+  group bg-cover bg-no-repeat bg-center 
 `);
 
 const twInfoContainer = twJoin(`
@@ -245,7 +323,19 @@ const twUserAvatarContainer = twJoin(`
   absolute w-[100px] h-[100px] -top-[50px] left-0
   flex justify-center 
   rounded-full border border-[#E6E6E6] bg-[#F3F3F3]
-  overflow-hidden 
+  overflow-hidden group 
+`);
+
+const twUserAvatarPhotoIconButton = twJoin(`
+  absolute w-[100px] h-[100px] top-0 right-0 
+  bg-black opacity-0 group-hover:opacity-100
+  z-10
+`);
+
+const twUserAvatarLoadingIcon = twJoin(`
+  absolute w-[100px] h-[100px] top-0 right-0 
+  animate-spin
+  z-20"
 `);
 
 const twNameFirstLetter = twJoin(`

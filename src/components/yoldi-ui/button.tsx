@@ -31,7 +31,7 @@ export default function Button({
   ].join(' ');
 
   const disabledColorsStyles = [
-    'text-[#f3f3f3]',
+    colors === 'light' ? 'text-black' : 'text-[#f3f3f3]',
     'bg-[#d4d4d4]', 'hover:bg-[#d4d4d4]',
     'border-[#d4d4d4]', 'hover:border-[#d4d4d4]',
   ].join(' ');
