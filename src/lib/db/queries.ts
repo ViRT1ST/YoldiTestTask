@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 
-import type { DbUserOrUndef, OauthProviders } from '@/types';
+import type { DbUserOrUndef, OauthProviders, DbUser } from '@/types';
 import { PG_CONFIG } from './config';
 
 const pool = new Pool(PG_CONFIG);
@@ -9,6 +9,16 @@ const pool = new Pool(PG_CONFIG);
 /* =============================================================
 All users
 ============================================================= */
+
+async function getAllUsers(): Promise<DbUser[] | undefined> {
+  const query = `
+    SELECT *
+    FROM users
+  `;
+
+  const { rows } = await pool.query(query);
+  return rows;
+}
 
 async function getUserByUuid(uuid: string): Promise<DbUserOrUndef> {
   const query = `
@@ -163,6 +173,7 @@ async function changeProfileAvatar(uuid: string, imageUrl: string): Promise<DbUs
 }
 
 const dbQueries = {
+  getAllUsers,
   getUserByUuid,
   getUserByAlias,
   getUserByAuthEmail,

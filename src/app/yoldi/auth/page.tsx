@@ -1,3 +1,4 @@
+import ContentWrapper from '@/components/body-children/content-wrapper';
 import AuthForm from '@/components/yoldi-auth/auth-form';
 
 export const metadata = {
@@ -6,6 +7,8 @@ export const metadata = {
 
 export default function AuthPage() {
   return (
-    <AuthForm />
+    <ContentWrapper className="xs:bg-[#F3F3F3]">
+      <AuthForm />
+    </ContentWrapper>
   );
 }

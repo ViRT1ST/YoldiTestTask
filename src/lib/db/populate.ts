@@ -34,6 +34,8 @@ const addUsers = `
     auth_email,
     auth_password,
     name,
+    avatar,
+    profile_cover,
     is_admin
   ) VALUES (
     '539560a8-9f98-46d3-8fb7-7806fec183c1',
@@ -43,6 +45,8 @@ const addUsers = `
     'grogu@gmail.com',
     '$2a$08$ovF5Xjjw.vqCthA5/OZzVuw0IAiNVhreIpWues.oM47EqNmuLs.3y',
     'Din Grogu',
+    NULL,
+    NULL,
     TRUE
   ), (
     '0871cf8b-908d-43cd-954c-d61848da3ad6',
@@ -52,6 +56,8 @@ const addUsers = `
     'example@gmail.com',
     '$2a$08$ovF5Xjjw.vqCthA5/OZzVuw0IAiNVhreIpWues.oM47EqNmuLs.3y',
     'Владислав',
+    'https://res.cloudinary.com/dbgj7kvye/image/upload/v1724307637/portfolio/_vlad_avatar_vctboz.png',
+    'https://res.cloudinary.com/dbgj7kvye/image/upload/v1724307638/portfolio/_vlad_cover_dmyxbi.jpg',
     FALSE
   ), (
     '8a2627fc-48f1-4c15-8ff9-f07e33798989',
@@ -61,6 +67,8 @@ const addUsers = `
     NULL,
     NULL,
     'Марина Демченко',
+    NULL,
+    NULL,
     FALSE
   ), (
     '4fd6466d-fc5d-4103-bd46-4a33025618f3',
@@ -70,6 +78,8 @@ const addUsers = `
     NULL,
     NULL,
     'mademz',
+    NULL,
+    NULL,
     FALSE
   );
 `;

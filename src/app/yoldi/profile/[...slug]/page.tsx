@@ -1,16 +1,13 @@
-import { auth } from '@/lib/auth/next-auth';
 import { redirect } from 'next/navigation';
+
+import type { SessionWithExtraData, DbUserOrUndef } from '@/types';
+import { auth } from '@/lib/auth/next-auth';
 import { changeProfileInfo } from '@/actions';
+import { makeUserProviderStamp } from '@/lib/utils';
+import ContentWrapper from '@/components/body-children/content-wrapper';
 import Profile from '@/components/yoldi-profile/profile';
 import dbQueries from '@/lib/db/queries';
 
-import type {
-  SessionWithExtraData, 
-  DbUser,
-  DbUserOrUndef,
-  AnyFieldsObject,
-  OauthProviders
-} from '@/types';
 
 export const metadata = {
   title: 'Yoldi Profile Page',
@@ -49,29 +46,13 @@ export default async function ProfilePage(context: any) {
 
   if (!dbUser) {
     return (
-      <p className="mt-10 mx-auto">
-        Пользователь не найден
-      </p>
+      <ContentWrapper>
+        <p className="mt-10 mx-auto">
+          Пользователь не найден
+        </p>
+      </ContentWrapper>
     );
   }
-
-  const makeProviderStamp = (provider: string, authEmail: string) => {
-    let providerStamp = '';
-
-    switch (provider) {
-      case 'google':
-        providerStamp = 'Пользователь Google';
-        break;
-      case 'github':
-        providerStamp = 'Пользователь GitHub';
-        break;
-      case 'credentials':
-        providerStamp = authEmail || '';
-        break;
-    }
-
-    return providerStamp;
-  };
 
   const dataToPass: any = {
     isAuthenticatedToEdit: sessionUuid === dbUser.uuid,
@@ -81,11 +62,13 @@ export default async function ProfilePage(context: any) {
     alias: dbUser.alias_custom || dbUser.alias_default,
     cover: dbUser.profile_cover,
     about: dbUser.profile_about || defaultAboutText,
-    providerStamp: makeProviderStamp(dbUser.default_auth_provider, dbUser.auth_email)
+    providerStamp: makeUserProviderStamp(dbUser.default_auth_provider, dbUser.auth_email)
   };
 
   return (
-    <Profile data={dataToPass} onSaveData={changeProfileInfo} />
+    <ContentWrapper className="relative w-full flex flex-col">
+      <Profile data={dataToPass} onSaveData={changeProfileInfo} />
+    </ContentWrapper>
   );
 }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { twJoin } from 'tailwind-merge';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,6 +10,8 @@ import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 import { AuthConstants } from '@/types';
 import { HeaderLogo } from '@/components/yoldi-ui/icons';
 import Button from '@/components/yoldi-ui/button';
+import Avatar from '@/components/yoldi-ui/avatar';
+import * as actions from '@/actions';
 
 interface HeaderProps {
   userData: {
@@ -36,12 +39,19 @@ export default function Header({ userData, authConstants }: HeaderProps) {
   const userNameShort = userNameFull.split(' ')[0];
   const userNameFirstLetter = userNameFull.charAt(0);
 
-  const handleAuthButtonClick = () => {
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+
+  const handleAuthButton = () => {
     router.push(pageData.path);
   };
 
-  const handleUserAvatarClick = () => {
-    console.log('handleUserAvatarClick');
+  const handleAvatarMenuClick = () => {
+    setIsAvatarMenuOpen(!isAvatarMenuOpen);
+  };
+
+  const handleLogout = () => {
+    setIsAvatarMenuOpen(false);
+    actions.signOutWithRedirectToAuthPage();
   };
 
   return (
@@ -59,33 +69,32 @@ export default function Header({ userData, authConstants }: HeaderProps) {
       </div>
 
       <div className={twUserArea}>
+        {/* Show user avatar or auth button */}
         {!isAuthPage && isUserAuthenticated ? (
           <>
             <span className={twUserName}>{userNameShort}</span>
-            <button className={twUserAvatarContainer} onClick={handleUserAvatarClick}>
-              {userPicture ? (
-                <Image
-                  src={userPicture}
-                  alt={userNameShort}
-                  className="h-full w-full"
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  priority={true}
-                /> 
-              ) : (
-                <div className={twUserFirstLetter}>
-                  {userNameFirstLetter}
-                </div>
-              )}
+            
+            <button className={twUserAvatarContainer} onClick={handleAvatarMenuClick}>
+              <Avatar url={userPicture} name={userNameFull} showBorder={true} />
             </button>
+
+            {isAvatarMenuOpen && (
+              <Button
+                className="absolute top-[70px] right-0 z-50"
+                colors="light"
+                size="normal"
+                onClick={handleLogout}
+              >
+                Выйти
+              </Button>
+            )}
           </>
         ) : (
           <Button
             className={'px-8 mt-[1px]'}
             colors="light"
             size="normal"
-            onClick={handleAuthButtonClick}
+            onClick={handleAuthButton}
           >
             {pageData.label}
           </Button>
@@ -120,7 +129,7 @@ const twTextForLogo = twJoin(`
 `);
 
 const twUserArea = twJoin(`
-  flex flex-row items-center 
+  relative flex flex-row justify-center items-center
   pr-[11px] xs:pr-0
 `);
 
@@ -131,14 +140,4 @@ const twUserName = twJoin(`
 
 const twUserAvatarContainer = twJoin(`
   w-[50px] h-[50px] mt-[1px] ml-5
-  flex justify-center items-center
-  border-[#E6E6E6] border-[1px] rounded-full
-  bg-[#F3F3F3]
-  overflow-hidden
-`);
-
-const twUserFirstLetter = twJoin(`
-  w-fill h-full pl-[1px]
-  flex justify-center items-center
-  text-[18px] 
 `);

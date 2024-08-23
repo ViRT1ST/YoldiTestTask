@@ -7,4 +7,4 @@ export const API_PATH = `${process.env.NEXT_PUBLIC_DOMAIN}/api`;
 export const REGISTRATION_STRING = 'registration';
 export const LOGIN_STRING = 'login';
 
-export const NEXTAUTH_API_PATH = '/api/auth';
+export const AUTH_API_PATH = '/api/auth';

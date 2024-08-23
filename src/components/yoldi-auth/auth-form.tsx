@@ -29,7 +29,7 @@ const pageDataSwitch = {
 };
 
 const defaultInputValues = {
-  name: 'Владислав', //'Владислав',
+  name: '', //'Владислав',
   email: 'example@gmail.com', //'example@gmail.com',
   password: 'password123!', // 'password123!',
 };

@@ -4,7 +4,6 @@
 package-lock.json
 \[unused\]/
 .env
-.env.local
 
 # dependencies
 /node_modules

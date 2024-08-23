@@ -2,11 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import * as actions from '@/actions';
-import { toast } from 'react-toastify';
 import { twMerge, twJoin } from 'tailwind-merge';
+import { toast } from 'react-toastify';
 
-import Image from 'next/image';
 
 import {
   EditIcon,
@@ -18,7 +16,10 @@ import {
   LoadingIcon
 } from '@/components/yoldi-ui/icons';
 import Button from '@/components/yoldi-ui/button';
+import Avatar from '@/components/yoldi-ui/avatar';
 import ProfileModal from '@/components/yoldi-profile/profile-modal';
+import ContentLimiter from '@/components/body-children/content-limiter';
+import * as actions from '@/actions';
 
 const changeCoverData = {
   upload: {
@@ -108,7 +109,7 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
   };
 
   return (
-    <div className={twPageContainer}>
+    <>
       <ProfileModal
         isOpen={isModalOpen}
         data={data}
@@ -163,148 +164,120 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
         )}
       </div>
 
-      <div className={twInfoContainer}>
-        <div className={twInfoLimiter}>
+      <ContentLimiter className="relative py-[85px]">
 
-          <div className={twUserAvatarContainer}>
-            {isAvatarChangeInProcess ? (
-              <span className={twUserAvatarLoadingIcon}>
-                <LoadingIcon />
-              </span>
-            ) : (
-              avatar ? (
-                <Image
-                  src={avatar}
-                  alt={name}
-                  className="h-full w-full"
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  priority={true}
-                /> 
-              ) : (
-                <span className={twNameFirstLetter}>
-                  {nameFirstLetter}
-                </span>
-              )
-            )}
+        <div className={twUserAvatarContainer}>
+          {isAvatarChangeInProcess ? (
+            <span className={twUserAvatarLoadingIcon}>
+              <LoadingIcon />
+            </span>
+          ) : (
+            <Avatar
+              url={avatar}
+              name={name}
+              className="w-[100px] h-[100px] text-[36px]"
+              showBorder={false}
+            />
+          )}
 
-            {isAuthenticatedToEdit && (
-              <>
-                <input
-                  ref={avatarFileInputRef}
-                  className="hidden"
-                  onChange={(e) => avatarInputFileHandler(e)}
-                  type="file"
-                  accept="image/png, image/jpeg"
-                  name="file"
-                />
+          {isAuthenticatedToEdit && (
+            <>
+              <input
+                ref={avatarFileInputRef}
+                className="hidden"
+                onChange={(e) => avatarInputFileHandler(e)}
+                type="file"
+                accept="image/png, image/jpeg"
+                name="file"
+              />
 
-                <button
-                  className={twUserAvatarPhotoIconButton}
-                  onClick={avatarChangeHandler}
-                >
-                  <span className={'w-full h-full flex justify-center items-center'}>
-                    <PhotoIcon />
-                  </span>
-                </button>
-              </>
-            )}
-          </div>
-
-          <section className={twContent}>
-  
-            <h1 className={twUserName}>{name}</h1>
-            <span className={twUserProviderStamp}>{providerStamp}</span>
-
-            {isAuthenticatedToEdit && (
-              <Button
-                className="mt-[10.5px] flex md:hidden"
-                colors="light"
-                size="normal"
-                onClick={() => setIsModalOpen(!isModalOpen)}
+              <button
+                className={twUserAvatarPhotoIconButton}
+                onClick={avatarChangeHandler}
               >
-                <span className={twSvgContainer}>
-                  <EditIcon />
+                <span className={'w-full h-full flex justify-center items-center'}>
+                  <PhotoIcon />
                 </span>
-                <span>Редактировать</span>
-              </Button>
-            )}
-
-            <p className={twUserAbout}>
-              {about}
-            </p>
-
-            {errorMsg && (
-              <div className={twErrorContainer}>
-                <p className="text-red-600">Error</p>
-                <ul >
-                  {errorMsg.split(' | ').map((error) => (
-                    <li key={error}>* {error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {isAuthenticatedToEdit && (
-              <Button
-                className="mt-[59.5px]"
-                colors="light"
-                size="normal"
-                onClick={() => actions.signOutWithRedirectToAuthPage()}
-              >
-                <span className={twSvgContainer}>
-                  <LogoutIcon />
-                </span>
-                <span>Выйти</span>
-              </Button>
-            )}
-          </section>
-
-          <aside className={twAside}>
-            {isAuthenticatedToEdit && (
-              <Button
-                className="hidden md:flex"
-                colors="light"
-                size="normal"
-                onClick={() => setIsModalOpen(!isModalOpen)}
-              >
-                <span className={twSvgContainer}>
-                  <EditIcon />
-                </span>
-                <span>Редактировать</span>
-              </Button>
-            )}  
-          </aside>
-
+              </button>
+            </>
+          )}
         </div>
-      </div>
 
-    </div>
+        <section className={twContent}>
+
+          <h1 className={twUserName}>{name}</h1>
+          <span className={twUserProviderStamp}>{providerStamp}</span>
+
+          {isAuthenticatedToEdit && (
+            <Button
+              className="mt-[10.5px] flex md:hidden"
+              colors="light"
+              size="normal"
+              onClick={() => setIsModalOpen(!isModalOpen)}
+            >
+              <span className={twSvgContainer}>
+                <EditIcon />
+              </span>
+              <span>Редактировать</span>
+            </Button>
+          )}
+
+          <p className={twUserAbout}>
+            {about}
+          </p>
+
+          {errorMsg && (
+            <div className={twErrorContainer}>
+              <p className="text-red-600">Error</p>
+              <ul >
+                {errorMsg.split(' | ').map((error) => (
+                  <li key={error}>* {error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {isAuthenticatedToEdit && (
+            <Button
+              className="mt-[59.5px]"
+              colors="light"
+              size="normal"
+              onClick={() => actions.signOutWithRedirectToAuthPage()}
+            >
+              <span className={twSvgContainer}>
+                <LogoutIcon />
+              </span>
+              <span>Выйти</span>
+            </Button>
+          )}
+        </section>
+
+        <aside className={twAside}>
+          {isAuthenticatedToEdit && (
+            <Button
+              className="hidden md:flex"
+              colors="light"
+              size="normal"
+              onClick={() => setIsModalOpen(!isModalOpen)}
+            >
+              <span className={twSvgContainer}>
+                <EditIcon />
+              </span>
+              <span>Редактировать</span>
+            </Button>
+          )}  
+        </aside>
+
+      </ContentLimiter>
+    </>
   );
 }
-
-const twPageContainer = twJoin(`
-  relative w-full
-  flex flex-col 
-`);
 
 const twCoverContainer = twJoin(`
   h-[200px]
   flex justify-center items-center
   bg-[#F3F3F3] border-b border-[#E6E6E6] 
   group bg-cover bg-no-repeat bg-center 
-`);
-
-const twInfoContainer = twJoin(`
-  px-[30px]
-  flex flex-grow 
-  bg-white
-`);
-
-const twInfoLimiter = twJoin(`
-  relative w-[800px] min-w-[280px] mx-auto py-[85px]
-  flex flex-row
 `);
 
 const twAside = twJoin(`
@@ -320,7 +293,7 @@ const twSvgContainer = twJoin(`
 `);
 
 const twUserAvatarContainer = twJoin(`
-  absolute w-[100px] h-[100px] -top-[50px] left-0
+  absolute w-[100px] h-[100px] -top-[50px] left-[29px]
   flex justify-center 
   rounded-full border border-[#E6E6E6] bg-[#F3F3F3]
   overflow-hidden group 
@@ -336,11 +309,6 @@ const twUserAvatarLoadingIcon = twJoin(`
   absolute w-[100px] h-[100px] top-0 right-0 
   animate-spin
   z-20"
-`);
-
-const twNameFirstLetter = twJoin(`
-  pt-[22px] mx-auto
-  text-[36px]
 `);
 
 const twUserName = twJoin(`

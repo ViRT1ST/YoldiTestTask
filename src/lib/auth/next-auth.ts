@@ -3,7 +3,7 @@ import Credentials from 'next-auth/providers/credentials';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
-import { NEXTAUTH_API_PATH } from '@/constants';
+import { AUTH_API_PATH } from '@/constants';
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
@@ -18,10 +18,10 @@ if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
   throw new Error('Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET');
 }
 
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
+const AUTH_SECRET = process.env.AUTH_SECRET;
 
-if (!NEXTAUTH_SECRET) {
-  throw new Error('Missing NEXTAUTH_SECRET');
+if (!AUTH_SECRET) {
+  throw new Error('Missing AUTH_SECRET');
 }
 
 const authOptions: NextAuthConfig = {
@@ -80,8 +80,8 @@ const authOptions: NextAuthConfig = {
   session: {
     strategy: 'jwt',  
   },
-  basePath: NEXTAUTH_API_PATH,
-  secret: NEXTAUTH_SECRET,
+  basePath: AUTH_API_PATH,
+  secret: AUTH_SECRET,
 };
 
 export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth(authOptions);
