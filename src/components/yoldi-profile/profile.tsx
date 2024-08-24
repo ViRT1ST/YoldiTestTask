@@ -2,9 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { twMerge, twJoin } from 'tailwind-merge';
+import { twMerge } from 'tailwind-merge';
 import { toast } from 'react-toastify';
-
 
 import {
   EditIcon,
@@ -19,6 +18,7 @@ import Button from '@/components/yoldi-ui/button';
 import Avatar from '@/components/yoldi-ui/avatar';
 import ProfileModal from '@/components/yoldi-profile/profile-modal';
 import ContentLimiter from '@/components/body-children/content-limiter';
+import { classesBeautify } from '@/lib/utils';
 import * as actions from '@/actions';
 
 const changeCoverData = {
@@ -273,59 +273,56 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
   );
 }
 
-const twCoverContainer = twJoin(`
-  h-[200px]
-  flex justify-center items-center
+const twCoverContainer = classesBeautify(`
+  h-[200px] flex justify-center items-center
   bg-[#F3F3F3] border-b border-[#E6E6E6] 
   group bg-cover bg-no-repeat bg-center 
 `);
 
-const twAside = twJoin(`
+const twAside = classesBeautify(`
   h-[200px]
 `);
 
-const twContent = twJoin(`
+const twContent = classesBeautify(`
   flex-grow
 `);
 
-const twSvgContainer = twJoin(`
+const twSvgContainer = classesBeautify(`
   w-[25px] h-[25px] px-[2px] py-[2px]
 `);
 
-const twUserAvatarContainer = twJoin(`
-  absolute w-[100px] h-[100px] -top-[50px] left-[29px]
-  flex justify-center 
+const twUserAvatarContainer = classesBeautify(`
+  absolute w-[100px] h-[100px] -top-[50px] left-[29px] flex justify-center 
   rounded-full border border-[#E6E6E6] bg-[#F3F3F3]
   overflow-hidden group 
 `);
 
-const twUserAvatarPhotoIconButton = twJoin(`
-  absolute w-[100px] h-[100px] top-0 right-0 
-  bg-black opacity-0 group-hover:opacity-100
-  z-10
+const twUserAvatarPhotoIconButton = classesBeautify(`
+  absolute w-[100px] h-[100px] top-0 right-0 z-10
+  bg-black
+  opacity-0 group-hover:opacity-100
 `);
 
-const twUserAvatarLoadingIcon = twJoin(`
-  absolute w-[100px] h-[100px] top-0 right-0 
+const twUserAvatarLoadingIcon = classesBeautify(`
+  absolute w-[100px] h-[100px] top-0 right-0 z-20
   animate-spin
-  z-20"
 `);
 
-const twUserName = twJoin(`
+const twUserName = classesBeautify(`
   mb-[11.5px]
   text-[30px] font-medium leading-[42px]
 `);
 
-const twUserProviderStamp = twJoin(`
+const twUserProviderStamp = classesBeautify(`
   block text-[#838383]
 `);
 
-const twUserAbout = twJoin(`
+const twUserAbout = classesBeautify(`
   mt-[30.5px]
   leading-[26px]
 `);
 
-const twErrorContainer = twJoin(`
+const twErrorContainer = classesBeautify(`
   w-full px-2 py-2 my-6 flex flex-col justify-center
   text-black bg-red-50 rounded-[5px]
 `);

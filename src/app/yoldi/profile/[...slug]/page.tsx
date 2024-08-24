@@ -1,13 +1,12 @@
 import { redirect } from 'next/navigation';
 
-import type { SessionWithExtraData, DbUserOrUndef } from '@/types';
+import type { SessionWithBaseData, DbUserOrUndef, DataToShowProfile } from '@/types';
 import { auth } from '@/lib/auth/next-auth';
-import { changeProfileInfo } from '@/actions';
 import { makeUserProviderStamp } from '@/lib/utils';
 import ContentWrapper from '@/components/body-children/content-wrapper';
 import Profile from '@/components/yoldi-profile/profile';
 import dbQueries from '@/lib/db/queries';
-
+import * as actions from '@/actions';
 
 export const metadata = {
   title: 'Yoldi Profile Page',
@@ -20,12 +19,18 @@ const defaultAboutText = `
   лишь показать наличие самого текста или продемонстрировать типографику в деле.
 `.replace(/\s+/g, ' ').trim();
 
-export default async function ProfilePage(context: any) {
-  const session = await auth() as SessionWithExtraData;
+interface ProfilePageProps {
+  params: {
+    slug: string[];
+  };
+}
+
+export default async function ProfilePage(props: ProfilePageProps) {
+  const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 
-  const slug = context?.params?.slug?.[0];
+  const slug = props.params.slug[0];
 
   // redirect if user is not logged and wants to access "current" user profile
   if (slug === 'me' && !sessionUuid) {
@@ -36,12 +41,12 @@ export default async function ProfilePage(context: any) {
 
   // db user is same as in session
   if (slug === 'me' && sessionUuid) {
-    dbUser = await dbQueries.getUserByUuid(sessionUuid as string);
+    dbUser = await dbQueries.getUserByUuid(sessionUuid);
   }
   
   // db user is any user except "current", no matter if current session user exist
   if (slug !== 'me') {
-    dbUser = await dbQueries.getUserByAlias(slug as string);
+    dbUser = await dbQueries.getUserByAlias(slug);
   }
 
   if (!dbUser) {
@@ -54,7 +59,7 @@ export default async function ProfilePage(context: any) {
     );
   }
 
-  const dataToPass: any = {
+  const dataToPass: DataToShowProfile = {
     isAuthenticatedToEdit: sessionUuid === dbUser.uuid,
     uuid: dbUser.uuid,
     avatar: dbUser.avatar,
@@ -67,7 +72,7 @@ export default async function ProfilePage(context: any) {
 
   return (
     <ContentWrapper className="relative w-full flex flex-col">
-      <Profile data={dataToPass} onSaveData={changeProfileInfo} />
+      <Profile data={dataToPass} onSaveData={actions.changeProfileInfo} />
     </ContentWrapper>
   );
 }

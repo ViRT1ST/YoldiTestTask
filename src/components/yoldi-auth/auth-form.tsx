@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { twMerge, twJoin } from 'tailwind-merge';
+import { twMerge } from 'tailwind-merge';
 
 import {
   NameIcon,
@@ -13,6 +13,7 @@ import {
 } from '@/components/yoldi-ui/icons';
 import Button from '@/components/yoldi-ui/button';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
+import { classesBeautify } from '@/lib/utils';
 import * as actions from '@/actions';
 
 const pageDataSwitch = {
@@ -29,9 +30,9 @@ const pageDataSwitch = {
 };
 
 const defaultInputValues = {
-  name: '', //'Владислав',
-  email: 'example@gmail.com', //'example@gmail.com',
-  password: 'password123!', // 'password123!',
+  name: '', // 'Владислав',
+  email: '', // 'example@gmail.com',
+  password: '', // 'password123!',
 };
 
 export default function AuthForm() {
@@ -93,7 +94,7 @@ export default function AuthForm() {
     <div className={twContainer}>
       <h1 className={twTitle}>{pageData.title}</h1>
 
-      <form action={actions.credetialsSignIn.bind(null, { formUrl })}>
+      <form action={actions.credetialsSignIn.bind(null, { form_url: formUrl })}>
 
         <div className={twInputFieldsContainer}>
           
@@ -216,64 +217,60 @@ export default function AuthForm() {
   );
 }
 
-const twContainer = twJoin(`
-  w-[400px] mx-auto
-  flex flex-col
-  border-[#E6E6E6] rounded-[5px]
-  bg-white font-inter
+const twContainer = classesBeautify(`
+  w-[400px] mx-auto flex flex-col
+  bg-white font-inter border-[#E6E6E6] rounded-[5px]
   border-0 xs:border
   my-[0px] xs:my-auto
   px-[31px] xs:px-[29px]
   py-[30px] xs:py-[29px] 
 `);
 
-const twTitle = twJoin(`
+const twTitle = classesBeautify(`
   mb-[25px]
   font-medium text-[30px] leading-[42px] whitespace-pre-line
 `);
 
-const twInputFieldsContainer = twJoin(`
+const twInputFieldsContainer = classesBeautify(`
   mb-[10px]
   px-0 xs:px-[5px] 
 `);
 
-const twInputFieldContainer = twJoin(`
+const twInputFieldContainer = classesBeautify(`
   relative mb-[15px] 
 `);
 
-const twInputField = twJoin(`
+const twInputField = classesBeautify(`
   h-[50px] w-full py-5 pl-[54px] pr-5
   outline-none border rounded-[5px] border-[#D4D4D4]
   placeholder-[#838383] caret-black/70
   focus:border-[#838383]
 `);
 
-const twSvgContainer = twJoin(`
+const twSvgContainer = classesBeautify(`
   absolute w-[25px] h-[25px]
 `);
 
-const twOAuthHintContainer = twJoin(`
-  w-full my-5 
-  flex items-center justify-center
+const twOAuthHintContainer = classesBeautify(`
+  w-full my-5 flex items-center justify-center
 `);
 
-const twOAuthHintLine = twJoin(`
+const twOAuthHintLine = classesBeautify(`
   flex-grow
   border-t border-[#D4D4D4]
   hidden xs:block
 `);
 
-const twOAuthHintText = twJoin(`
-  w-auto mx-4
-  flex-grow-0
+const twOAuthHintText = classesBeautify(`
+  w-auto mx-4 flex-grow-0
   text-xs text-[#838383] text-center 
 `);
 
-const twOAuthButtonsContainer = twJoin(`
+const twOAuthButtonsContainer = classesBeautify(`
   flex flex-row gap-[10px]
 `);
 
-const twErrorContainer = twJoin(`
+const twErrorContainer = classesBeautify(`
   w-full px-2 py-2 mb-4 flex flex-col justify-center
   text-black bg-red-50 rounded-[5px]
 `);

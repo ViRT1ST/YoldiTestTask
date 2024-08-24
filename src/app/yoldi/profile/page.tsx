@@ -6,8 +6,9 @@ export const metadata = {
 
 interface RedirectToProfileProps {
   searchParams?: {
-    [key: string]: string | string[] | undefined
-  };
+    error?: string;
+    code?: string;
+  } | null | undefined;
 }
 
 export default function RedirectToProfile({ searchParams }: RedirectToProfileProps) {

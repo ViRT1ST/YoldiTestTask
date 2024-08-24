@@ -4,16 +4,28 @@ import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
+import type {
+  SessionWithProviderData,
+  SessionWithUpdateData,
+  ErrorForRedirect,
+  DbUser
+} from '@/types';
 import { auth, signOut, unstable_update} from '@/lib/auth/next-auth';
 import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
 import { ExtendedError } from '@/errors';
-import type { SessionWithExtraData } from '@/types';
 import dbQueries from '@/lib/db/queries';
 
 const defaultError = { message: 'Failed to authenticate', code: 401 };
 
 export async function authorizeUser() {
-  const session = await auth() as SessionWithExtraData;
+  let session = await auth() as SessionWithProviderData;
+
+  if (!session) {
+    return signOut({
+      redirectTo: `/yoldi/auth?error=${defaultError.message}&code=${defaultError.code}`
+    });
+  }
+
   const providerData = session?.user?.provider_data;
   const authProvider = session?.user?.iss;
 
@@ -24,8 +36,8 @@ export async function authorizeUser() {
   }
 
   let isRegistrationPage = false;
-  let authError: any = null;
-  let dbUser: any = null;
+  let authError: ErrorForRedirect = null;
+  let dbUser: DbUser | undefined = undefined;
 
   /* =============================================================
   Credentials authorization passing
@@ -33,9 +45,9 @@ export async function authorizeUser() {
 
   if (authProvider === 'credentials') {
     try {
-      const { name, email, password, formUrl } = providerData;
+      const { name, email, password, form_url } = providerData;
 
-      if (typeof formUrl === 'string' && formUrl.includes('method=registration')) {
+      if (typeof form_url === 'string' && form_url.includes('method=registration')) {
         isRegistrationPage = true;
       }
 
@@ -63,7 +75,7 @@ export async function authorizeUser() {
 
         // Process user credentials
         } else {
-          dbUser = await dbQueries.getUserByAuthEmail(email as string);
+          dbUser = await dbQueries.getUserByAuthEmail(result.data.email);
 
           // Found existing user -> throw error
           // User not found -> new user registration
@@ -72,9 +84,9 @@ export async function authorizeUser() {
 
           } else {
             dbUser = await dbQueries.createUserByAuthEmail(
-              email as string,
-              password as string,
-              name as string
+              result.data.email,
+              result.data.password,
+              result.data.name
             );
 
             if (!dbUser) {
@@ -105,14 +117,14 @@ export async function authorizeUser() {
 
         // Process user credentials
         } else {
-          dbUser = await dbQueries.getUserByAuthEmail(email as string);
+          dbUser = await dbQueries.getUserByAuthEmail(result.data.email);
 
           if (!dbUser) {
             throw new ExtendedError(400, 'User not found');
 
           } else {
             const match = await bcrypt.compare(
-              password as string,
+              result.data.password,
               dbUser.auth_password
             );
 
@@ -191,13 +203,8 @@ export async function authorizeUser() {
   ============================================================= */
 
   if (!authError && dbUser) {
-    await unstable_update({
+    const updateData: SessionWithUpdateData = {
       user: {
-        // name: null,
-        // email: null,
-        // sub: null,
-        // picture: null,
-        // provider_data: null,
         replace_data: {
           uuid: dbUser.uuid,
           avatar: dbUser.avatar,
@@ -206,8 +213,10 @@ export async function authorizeUser() {
           is_admin: dbUser.is_admin,
           iss: authProvider
         }
-      } as any
-    });
+      }
+    };
+
+    await unstable_update(updateData);
   }
 
   /* =============================================================

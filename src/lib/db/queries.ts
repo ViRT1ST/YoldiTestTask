@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 
-import type { DbUserOrUndef, OauthProviders, DbUser } from '@/types';
+import type { DbUserOrUndef, OauthProviders, DbUser, ProfileNewInfo } from '@/types';
 import { PG_CONFIG } from './config';
 
 const pool = new Pool(PG_CONFIG);
@@ -10,17 +10,18 @@ const pool = new Pool(PG_CONFIG);
 All users
 ============================================================= */
 
-async function getAllUsers(): Promise<DbUser[] | undefined> {
+async function getAllUsers() {
   const query = `
     SELECT *
     FROM users
+    ORDER BY id
   `;
 
   const { rows } = await pool.query(query);
-  return rows;
+  return rows as DbUser[];
 }
 
-async function getUserByUuid(uuid: string): Promise<DbUserOrUndef> {
+async function getUserByUuid(uuid: string) {
   const query = `
     SELECT *
     FROM users
@@ -29,10 +30,10 @@ async function getUserByUuid(uuid: string): Promise<DbUserOrUndef> {
   `;
 
   const { rows } = await pool.query(query, [uuid]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
-async function getUserByAlias(alias: string): Promise<DbUserOrUndef> {
+async function getUserByAlias(alias: string) {
   const query = `
     SELECT *
     FROM users
@@ -43,14 +44,14 @@ async function getUserByAlias(alias: string): Promise<DbUserOrUndef> {
   const lowerAlias = alias.toLowerCase();
 
   const { rows } = await pool.query(query, [lowerAlias]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
 /* =============================================================
 Users with authentication by email and password
 ============================================================= */
 
-async function getUserByAuthEmail(email: string): Promise<DbUserOrUndef> {
+async function getUserByAuthEmail(email: string) {
   const query = `
     SELECT *
     FROM users
@@ -59,12 +60,12 @@ async function getUserByAuthEmail(email: string): Promise<DbUserOrUndef> {
   `;
 
   const { rows } = await pool.query(query, [email]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
 async function createUserByAuthEmail(
   email: string, password: string, profileName: string = 'Anonymous'
-): Promise<DbUserOrUndef> {
+) {
   const query = `
     INSERT INTO users (default_auth_provider, auth_email, auth_password, name)
     VALUES ('credentials', $1, $2, $3)
@@ -74,14 +75,14 @@ async function createUserByAuthEmail(
   const hashedPassword = await bcrypt.hash(password, 8);
 
   const { rows } = await pool.query(query, [email, hashedPassword, profileName]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
 /* =============================================================
 Users with authentication by third party auth providers
 ============================================================= */
 
-async function getUserByAuthId(provider: OauthProviders, id: string): Promise<DbUserOrUndef> {
+async function getUserByAuthId(provider: OauthProviders, id: string) {
   const query = `
     SELECT *
     FROM users
@@ -90,12 +91,12 @@ async function getUserByAuthId(provider: OauthProviders, id: string): Promise<Db
   `;
 
   const { rows } = await pool.query(query, [id]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
 async function createUserByAuthId(
   provider: OauthProviders, id: string, name: string = 'Anonymous', avatar: string
-): Promise<DbUserOrUndef> {
+) {
   const query = `
     INSERT INTO users (default_auth_provider, ${provider}_id, name, avatar)
     VALUES ($1, $2, $3, $4)
@@ -103,15 +104,15 @@ async function createUserByAuthId(
   `;
   
   const { rows } = await pool.query(query, [provider, id, name, avatar]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
 /* =============================================================
 Update profile info
 ============================================================= */
 
-async function updateProfileInfo(data: any): Promise<DbUserOrUndef> {
-  const { uuid, name, alias, about } = data;
+async function updateProfileInfo(newInfo: ProfileNewInfo) {
+  const { uuid, name, alias, about } = newInfo;
 
   const paramsForSet: string[] = [];
   const paramsToPass: any[] = [uuid];
@@ -136,10 +137,10 @@ async function updateProfileInfo(data: any): Promise<DbUserOrUndef> {
   `;
 
   const { rows } = await pool.query(query, paramsToPass);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
-async function changeProfileCover(uuid: string, imageUrl: string): Promise<DbUserOrUndef> {
+async function changeProfileCover(uuid: string, imageUrl: string) {
   const query = `
     UPDATE users
     SET profile_cover = $2
@@ -147,10 +148,10 @@ async function changeProfileCover(uuid: string, imageUrl: string): Promise<DbUse
   `;
 
   const { rows } = await pool.query(query, [uuid, imageUrl]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
-async function deleteProfileCover(uuid: string): Promise<DbUserOrUndef> {
+async function deleteProfileCover(uuid: string) {
   const query = `
     UPDATE users
     SET profile_cover = NULL
@@ -158,10 +159,10 @@ async function deleteProfileCover(uuid: string): Promise<DbUserOrUndef> {
   `;
 
   const { rows } = await pool.query(query, [uuid]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
-async function changeProfileAvatar(uuid: string, imageUrl: string): Promise<DbUserOrUndef> {
+async function changeProfileAvatar(uuid: string, imageUrl: string) {
   const query = `
     UPDATE users
     SET avatar = $2
@@ -169,7 +170,7 @@ async function changeProfileAvatar(uuid: string, imageUrl: string): Promise<DbUs
   `;
 
   const { rows } = await pool.query(query, [uuid, imageUrl]);
-  return rows[0];
+  return rows[0] as DbUserOrUndef;
 }
 
 const dbQueries = {

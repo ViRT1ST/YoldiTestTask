@@ -2,15 +2,14 @@
 
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { twJoin } from 'tailwind-merge';
-import Image from 'next/image';
 import Link from 'next/link';
 
+import type { AuthConstants } from '@/types';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
-import { AuthConstants } from '@/types';
 import { HeaderLogo } from '@/components/yoldi-ui/icons';
 import Button from '@/components/yoldi-ui/button';
 import Avatar from '@/components/yoldi-ui/avatar';
+import { classesBeautify } from '@/lib/utils';
 import * as actions from '@/actions';
 
 interface HeaderProps {
@@ -25,9 +24,9 @@ export default function Header({ userData, authConstants }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
 
+  const isAuthPage = pathname === authConstants.authPagePath;
   const isRegistrationPage = searchParams.get('method') === REGISTRATION_STRING;
-  const isAuthPage = pathname.includes(authConstants.authPageUrlPart);
-
+  
   const pageData = isRegistrationPage
     ? authConstants[LOGIN_STRING]
     : authConstants[REGISTRATION_STRING];
@@ -37,7 +36,6 @@ export default function Header({ userData, authConstants }: HeaderProps) {
   const userPicture = userData?.avatar || null;
   const userNameFull = userData?.name || 'Anonymous';
   const userNameShort = userNameFull.split(' ')[0];
-  const userNameFirstLetter = userNameFull.charAt(0);
 
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
 
@@ -105,39 +103,37 @@ export default function Header({ userData, authConstants }: HeaderProps) {
   );
 }
 
-const twHeaderContainer = twJoin(`
-  h-20 px-5
-  flex flex-row justify-between
+const twHeaderContainer = classesBeautify(`
+  h-20 px-5 flex flex-row justify-between
   border-[#E6E6E6] border-b
   font-inter
 `);
 
-const twLogoArea = twJoin(`
-  relative pt-[12.5px]
-  flex flex-row flex-grow 
+const twLogoArea = classesBeautify(`
+  relative pt-[12.5px] flex flex-row flex-grow 
 `);
 
-const twLogoContainer = twJoin(`
+const twLogoContainer = classesBeautify(`
   h-[50px] w-20 mr-5 mt-[2.5px]
   bg-[#FEFF80] 
 `);
 
-const twTextForLogo = twJoin(`
+const twTextForLogo = classesBeautify(`
   absolute left-[100px] pt-[3px]
   text-base leading-[26px]
   hidden sm:block 
 `);
 
-const twUserArea = twJoin(`
+const twUserArea = classesBeautify(`
   relative flex flex-row justify-center items-center
   pr-[11px] xs:pr-0
 `);
 
-const twUserName = twJoin(`
+const twUserName = classesBeautify(`
   mt-0.5
   leading-[26px]
 `);
 
-const twUserAvatarContainer = twJoin(`
+const twUserAvatarContainer = classesBeautify(`
   w-[50px] h-[50px] mt-[1px] ml-5
 `);

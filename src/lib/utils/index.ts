@@ -22,7 +22,7 @@ export function convertErrorZodResultToMsgArray(result: any) {
   return errorMessages;
 }
 
-export const makeUserProviderStamp = (provider: string, authEmail: string) => {
+export function makeUserProviderStamp(provider: string, authEmail: string) {
   let providerStamp = '';
 
   switch (provider) {
@@ -40,4 +40,8 @@ export const makeUserProviderStamp = (provider: string, authEmail: string) => {
   return providerStamp;
 };
 
-
+export function classesBeautify(classes: string) {
+  // removes extra spaces and line breaks
+  // .replace(/\b(?:undefined|false|null)\b\s*/g, '')
+  return classes.replace(/\s+/g, ' ').trim();
+};

@@ -38,17 +38,6 @@ const addUsers = `
     profile_cover,
     is_admin
   ) VALUES (
-    '539560a8-9f98-46d3-8fb7-7806fec183c1',
-    'credentials',
-    NULL,
-    NULL,
-    'grogu@gmail.com',
-    '$2a$08$ovF5Xjjw.vqCthA5/OZzVuw0IAiNVhreIpWues.oM47EqNmuLs.3y',
-    'Din Grogu',
-    NULL,
-    NULL,
-    TRUE
-  ), (
     '0871cf8b-908d-43cd-954c-d61848da3ad6',
     'credentials',
     NULL,
@@ -60,14 +49,47 @@ const addUsers = `
     'https://res.cloudinary.com/dbgj7kvye/image/upload/v1724307638/portfolio/_vlad_cover_dmyxbi.jpg',
     FALSE
   ), (
-    '8a2627fc-48f1-4c15-8ff9-f07e33798989',
+    '2d358450-5a4c-4ec6-9270-47d628ce33d1',
+    'credentials',
+    NULL,
+    NULL,
+    'eugenearbatsky@yandex.ru',
+    '$2a$08$ovF5Xjjw.vqCthA5/OZzVuw0IAiNVhreIpWues.oM47EqNmuLs.3y',
+    'Евгений',
+    NULL,
+    NULL,
+    FALSE
+  ), (
+    'dd90fbe9-9012-4131-88b5-aa0a3fcdff9e',
+    'credentials',
+    NULL,
+    NULL,
+    'andrew1245@gmail.com',
+    '$2a$08$ovF5Xjjw.vqCthA5/OZzVuw0IAiNVhreIpWues.oM47EqNmuLs.3y',
+    'Андрей',
+    NULL,
+    NULL,
+    FALSE
+  ), (
+    'e918173f-8cdc-4596-936a-42139191a44a',
+    'credentials',
+    NULL,
+    NULL,
+    'annadearmas1988@gmail.com',
+    '$2a$08$ovF5Xjjw.vqCthA5/OZzVuw0IAiNVhreIpWues.oM47EqNmuLs.3y',
+    'Анна',
+    'https://res.cloudinary.com/dbgj7kvye/image/upload/v1724396008/portfolio/_anna-de-armas_biubni.jpg',
+    NULL,
+    FALSE
+  ), (
+    '69f8e923-9ef0-4001-89db-723ce98b51d2',
     'google',
     '105837393022960528763',
     NULL,
     NULL,
     NULL,
-    'Марина Демченко',
-    NULL,
+    'Марина',
+    'https://lh3.googleusercontent.com/a/ACg8ocINUmBMx4arBV3nor_d4cQdP9tIbabo8TW1WLa0ZFU-42z50w=s512-c',
     NULL,
     FALSE
   ), (
@@ -77,8 +99,8 @@ const addUsers = `
     '166623076',
     NULL,
     NULL,
-    'mademz',
-    NULL,
+    'MaDemz',
+    'https://avatars.githubusercontent.com/u/166623076?v=4',
     NULL,
     FALSE
   );

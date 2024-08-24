@@ -1,11 +1,13 @@
-import { twJoin, twMerge } from 'tailwind-merge';
+import { twMerge } from 'tailwind-merge';
 import Image from 'next/image';
 
+import { classesBeautify } from '@/lib/utils';
+
 interface AvatarProps {
-  url: string | null | undefined,
-  name: string | null | undefined,
-  showBorder?: boolean,
-  className?: string,
+  url: string | null | undefined;
+  name: string | null | undefined;
+  showBorder?: boolean;
+  className?: string;
   [prop: string]: any;
 }
 
@@ -42,14 +44,13 @@ export default function Avatar({
   );
 }
 
-const twUserAvatarContainer = twJoin(`
-  w-[50px] h-[50px]
-  flex justify-center items-center
+const twUserAvatarContainer = classesBeautify(`
+  w-[50px] h-[50px] flex justify-center items-center
   bg-[#F3F3F3] rounded-full overflow-hidden
 `);
 
-const twNameFirstLetter = twJoin(`
-  w-fill h-full pl-[1px] pt-[1px] text-[18px]
-  flex justify-center items-center
+const twNameFirstLetter = classesBeautify(`
+  w-fill h-full pl-[1px] pt-[1px] flex justify-center items-center
+  text-[18px]
 `);
 

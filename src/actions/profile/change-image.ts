@@ -2,7 +2,11 @@
 
 import { redirect } from 'next/navigation';
 
-import type { SessionWithExtraData } from '@/types';
+import type {
+  SessionWithBaseData,
+  SessionWithUpdateData,
+  ErrorForRedirect
+} from '@/types';
 import { auth, unstable_update } from '@/lib/auth/next-auth';
 import cloudinary from '@/lib/cloudinary/config';
 import dbQueries from '@/lib/db/queries';
@@ -13,13 +17,13 @@ interface ChangeProfileImageProps {
 }
 
 export async function changeProfileImage({ formData, imageToChange }: ChangeProfileImageProps) {
-  const session = await auth() as SessionWithExtraData;
+  const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 
   const image = formData.get('file') as File;
 
-  let returnError: any = null;
+  let returnError: ErrorForRedirect = null;
 
   if (!image) {
     returnError = { message: 'Incorrect image', code: 400 };
@@ -53,14 +57,16 @@ export async function changeProfileImage({ formData, imageToChange }: ChangeProf
       await dbQuery(sessionUuid, imageUrl);
 
       if (imageToChange === 'avatar') {
-        await unstable_update({
+        const updateData: SessionWithUpdateData = {
           user: {
             replace_data: {
               ...sessionUser,
-              avatar: imageUrl || sessionUser?.avatar
+              avatar: imageUrl || sessionUser.avatar
             }
           }
-        } as any);
+        };
+
+        await unstable_update(updateData);
       }
 
     } catch (error: any) {

@@ -1,11 +1,11 @@
 'use client';
 
-import { usePathname, useSearchParams  } from 'next/navigation';
-import { twJoin } from 'tailwind-merge';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
+import type { AuthConstants } from '@/types';
+import { classesBeautify } from '@/lib/utils';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
-import { AuthConstants } from '@/types';
 
 interface FooterProps {
   authConstants: AuthConstants;
@@ -15,8 +15,8 @@ export default function Footer({ authConstants }: FooterProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
+  const isAuthPage = pathname === authConstants.authPagePath;
   const isRegistrationPage = searchParams.get('method') === REGISTRATION_STRING;
-  const isAuthPage = pathname.includes(authConstants.authPageUrlPart);
 
   const pageData = isRegistrationPage
     ? authConstants[LOGIN_STRING]
@@ -36,14 +36,13 @@ export default function Footer({ authConstants }: FooterProps) {
   return null;
 }
 
-const twContainer = twJoin(`
-  h-[72px]
-  flex flex-row justify-center items-center
+const twContainer = classesBeautify(`
+  h-[72px] flex flex-row justify-center items-center
   border-[#E6E6E6] border-t
   font-inter
 `);
 
-const twLink = twJoin(`
+const twLink = classesBeautify(`
   flex flex-row gap-[4.5px]
   pb-0 xs:pb-[1px]
   pr-[1.5px] xs:pr-0

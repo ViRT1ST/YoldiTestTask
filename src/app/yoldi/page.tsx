@@ -1,25 +1,9 @@
-import ContentWrapper from '@/components/body-children/content-wrapper';
-
-import AccountList from '@/components/yoldi-main-page/accounts-list';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Yoldi Page',
+  title: 'Portfolio Main Page',
 };
 
 export default function MainPage() {
-  return (
-    <ContentWrapper>
-      <AccountList />
-    </ContentWrapper>
-  );
+  redirect('/yoldi/accounts');
 }
-
-
-
-// export default function MainPage() {
-//   return (
-//     <p className="mt-10 mx-auto">
-//       Главная страница (нет контента)
-//     </p>
-//   );
-// }

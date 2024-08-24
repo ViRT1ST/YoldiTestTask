@@ -4,18 +4,25 @@ import { z } from 'zod';
 import { redirect } from 'next/navigation';
 // import { revalidatePath } from 'next/cache';
 
+import { Session } from 'next-auth';
+
+import type {
+  ProfileNewInfo,
+  SessionWithBaseData,
+  SessionWithUpdateData,
+  ErrorForRedirect
+} from '@/types';
 import { auth, unstable_update  } from '@/lib/auth/next-auth';
 import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
 import { ExtendedError } from '@/errors';
-import type { ProfileInfo, SessionWithExtraData } from '@/types';
 import dbQueries from '@/lib/db/queries';
 
-export async function changeProfileInfo(data: ProfileInfo) {
-  const session = await auth() as SessionWithExtraData;
+export async function changeProfileInfo(newInfo: ProfileNewInfo) {
+  const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 
-  let returnError: any = null;
+  let returnError: ErrorForRedirect = null;
 
   if (sessionUuid) {
     const updateInfoSchema = z.object({
@@ -29,7 +36,7 @@ export async function changeProfileInfo(data: ProfileInfo) {
         .min(3, { message: 'URL alias must be at least 3 characters'})
         .refine(
           (value) => /^[^id][a-zA-Z0-9]+$/.test(value ?? ''), {
-            message: 'URL alias must contain only letters and numbers and cannot start with string "id"'
+            message: 'URL alias must contain only letters and numbers and cannot start with "id"'
         }),
         // .optional()
         // .or(z.literal('')),
@@ -39,7 +46,7 @@ export async function changeProfileInfo(data: ProfileInfo) {
     });
 
     try {
-      const result = updateInfoSchema.safeParse(data);
+      const result = updateInfoSchema.safeParse(newInfo);
 
       // Throw error if validation fails
       if (!result.success) {
@@ -54,7 +61,8 @@ export async function changeProfileInfo(data: ProfileInfo) {
 
         // Find user with same custom alias
         const userWithSameAlias = await dbQueries.getUserByAlias(fixedAlias);
-        if (userWithSameAlias?.alias_custom) {
+        const isNotSameUser = sessionUuid !== userWithSameAlias?.uuid;
+        if (userWithSameAlias?.alias_custom && isNotSameUser) {
           throw new ExtendedError(400, 'URL alias already in use');
         }
 
@@ -65,15 +73,17 @@ export async function changeProfileInfo(data: ProfileInfo) {
           about: fixedAbout
         });
 
-        await unstable_update({
+        const updateData: SessionWithUpdateData = {
           user: {
             replace_data: {
               ...sessionUser,
-              name: name || sessionUser?.name,
-              alias: fixedAlias || sessionUser?.alias
+              name: name,
+              alias: fixedAlias
             }
           }
-        } as any);
+        };
+
+        await unstable_update(updateData);
       }
       
     } catch (error: any) {

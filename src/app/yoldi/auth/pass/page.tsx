@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { authorizeUser } from '@/actions';
+import * as actions from '@/actions';
 
 export default function AuthPassPage() {
   const autoSubmitForm = useRef<HTMLFormElement>(null);
@@ -14,9 +14,9 @@ export default function AuthPassPage() {
 
   // Auto submit form
   return (
-    <div className="p-4 invisible">
-      <form ref={autoSubmitForm} name="autoSubmit" action={authorizeUser}>
-        <button type="submit">Update Session</button>
+    <div className="invisible">
+      <form ref={autoSubmitForm} name="autoSubmit" action={actions.authorizeUser}>
+        <button type="submit">Process User Auth</button>
       </form>
     </div>
   );

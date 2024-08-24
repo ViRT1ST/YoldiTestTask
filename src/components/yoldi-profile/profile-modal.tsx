@@ -1,10 +1,11 @@
 'use client';
 
-import { twMerge, twJoin } from 'tailwind-merge';
-import { useState,useEffect } from 'react';
+import { twMerge } from 'tailwind-merge';
+import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import Button from '@/components/yoldi-ui/button';
+import { classesBeautify } from '@/lib/utils';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -102,18 +103,16 @@ export default function ProfileModal({ isOpen, data, onSaveData, close }: Profil
   return ReactDOM.createPortal(modal, modalContainer);
 }
 
-const twModal = twJoin(`
-  z-50 min-h-screen w-full 
-  flex flex-col justify-center
+const twModal = classesBeautify(`
+  min-h-screen w-full flex flex-col justify-center z-50
   font-inter
   pt-[80px] sm:pt-0
   items-start sm:items-center
   bg-transparent sm:bg-black/30 
 `);
 
-const twForm = twJoin(`
-  px-[30px] py-[30px]
-  flex flex-col
+const twForm = classesBeautify(`
+  px-[30px] py-[30px] flex flex-col
   bg-white
   w-full sm:w-[600px] 
   h-full sm:h-[580px] 
@@ -121,41 +120,39 @@ const twForm = twJoin(`
   rounded-[0px] md:rounded-[5px]
 `);
 
-const twFlexContainer = twJoin(`
+const twFlexContainer = classesBeautify(`
   flex flex-col
 `);
 
-const twTitle = twJoin(`
+const twTitle = classesBeautify(`
   mb-[24px]
   font-medium leading-[42px] text-[30px]
 `);
 
-const twLabel = twJoin(`
+const twLabel = classesBeautify(`
   mb-[4.5px]
   font-medium leading-[26px] text-[#838383]
 `);
 
-const twInput = twJoin(`
+const twInput = classesBeautify(`
   w-full h-[50px] mb-[15.5px] px-[19px] pt-0
   outline-none border rounded-[5px] border-[#D4D4D4]
   placeholder-[#838383] caret-black/70
   focus:border-[#838383]
 `);
 
-const twUrlContainer = twJoin(`
-  relative h-[50px] mb-[16px]
-  flex flex-row items-center 
+const twUrlContainer = classesBeautify(`
+  relative h-[50px] mb-[16px] flex flex-row items-center 
 `);
 
-const twUrlLeft = twJoin(`
+const twUrlLeft = classesBeautify(`
   z-10 absolute h-[50px] px-[19px] py-[12.5px] 
   bg-[#F3F3F3] text-[#838383] 
   border rounded-[5px] rounded-tr-none rounded-br-none border-r-[#D4D4D4]
 `);
 
-const twTextArea = twJoin(`
-  w-full px-[19px] py-3 mb-[25px]
-  flex flex-grow 
+const twTextArea = classesBeautify(`
+  w-full px-[19px] py-3 mb-[25px] flex flex-grow 
   outline-none border rounded-[5px] border-[#D4D4D4]
   caret-black/70 leading-[26px]
   focus:border-[#838383]

@@ -1,6 +1,6 @@
+import type { SessionWithBaseData } from '@/types';
 import { auth } from '@/lib/auth/next-auth';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
-import type { SessionWithExtraData } from '@/types';
 import Header from '@/components/yoldi-ui/header';
 import Footer from '@/components/yoldi-ui/footer';
 
@@ -15,7 +15,7 @@ export const authConstants = {
     label: 'Зарегистрироваться',
     path: '/yoldi/auth?method=registration'
   },
-  authPageUrlPart: 'yoldi/auth',
+  authPagePath: '/yoldi/auth',
 };
 
 interface YoldiLayoutProps {
@@ -23,7 +23,7 @@ interface YoldiLayoutProps {
 }
 
 export default async function YoldiLayout({ children }: YoldiLayoutProps) {
-  const session = await auth() as SessionWithExtraData;
+  const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
 
   return (

@@ -1,5 +1,6 @@
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 
+
 /* =============================================================
 Database Schemas And Types
 ============================================================= */
@@ -30,9 +31,11 @@ export type DbUserOrUndef = DbUser | undefined;
 Other Types
 ============================================================= */
 
-export type AnyFieldsObject = {
-  [key: string]: any;
-};
+// export type AnyFieldsObject = {
+//   [key: string]: any;
+// };
+
+export type AnyFieldsObject = Record<string, string>
 
 export type OauthProviders = (
   'google' | 'github'
@@ -52,39 +55,50 @@ export type AuthFormData = {
   isRegistrationPage: boolean,
 }
 
-export type SessionWithExtraData = ({
-  user?: {
-    iat?: number;
-    exp?: number;
-    jti?: string;
-    iss?: string;
-    uuid?: string;
-    name?: string;
-    avatar?: string | null;
-    alias?: string;
-    is_admin?: boolean
+export type SessionMainFields = {
+  iat?: number;
+  exp?: number;
+  jti?: string;
+  iss?: string;
+  uuid?: string;
+  name?: string;
+  avatar?: string | null;
+  alias?: string;
+  is_admin?: boolean;
+}
+
+export type SessionWithBaseData = ({
+  user: SessionMainFields
+}) | null;
+
+export type SessionWithProviderData = SessionWithBaseData & {
+  user: {
     provider_data?: {
       name?: string;
       email?: string;
       password?: string;
-      callbackUrl?: string;
-      formUrl?: string;
+      form_url?: string;
       sub?: string,
       picture?: string;
       login?: string;
       id?: number;
       avatar_url?: string;
-    },
-    replace_data?: {
-      iss: string;
-      uuid: string;
-      name: string;
-      avatar: string | null;
-      alias: string;
-      is_admin: boolean
     }
-  } | undefined | null;
-}) | undefined | null;
+  }
+}
+
+export type SessionWithUpdateData = SessionWithBaseData & {
+  user: {
+    replace_data: {
+      iss?: string;
+      uuid?: string;
+      name?: string;
+      avatar?: string | null;
+      alias?: string;
+      is_admin?: boolean
+    }
+  }
+}
 
 export type AuthConstants = {
   [REGISTRATION_STRING]: {
@@ -97,12 +111,28 @@ export type AuthConstants = {
     label: string;
     path: string;
   };
-  authPageUrlPart: string;
+  authPagePath: string;
 }
 
-export type ProfileInfo = {
-  name: string,
-  alias: string,
-  about: string
+export type DataToShowProfile = {
+  isAuthenticatedToEdit: boolean;
+  uuid: string;
+  avatar: string | null;
+  name: string;
+  alias: string;
+  cover: string | null;
+  about: string | null;
+  providerStamp: string;
 }
 
+export type ProfileNewInfo = {
+  uuid: string;
+  name: string;
+  alias: string;
+  about: string;
+}
+
+export type ErrorForRedirect = {
+  message: string;
+  code: number
+} | null
