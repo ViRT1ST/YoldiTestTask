@@ -7,11 +7,11 @@ import type { AuthConstants } from '@/types';
 import { classesBeautify } from '@/lib/utils';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 
-interface FooterProps {
+type Props = {
   authConstants: AuthConstants;
-}
+};
 
-export default function Footer({ authConstants }: FooterProps) {
+export default function Footer({ authConstants }: Props) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 

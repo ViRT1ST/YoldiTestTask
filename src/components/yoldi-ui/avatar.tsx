@@ -3,27 +3,21 @@ import Image from 'next/image';
 
 import { classesBeautify } from '@/lib/utils';
 
-interface AvatarProps {
+type Props = React.ComponentProps<'div'> & {
   url: string | null | undefined;
   name: string | null | undefined;
   showBorder?: boolean;
-  className?: string;
-  [prop: string]: any;
-}
+};
 
-export default function Avatar({
-  url, name, showBorder = true, className, ...rest
-}: AvatarProps) {
+export default function Avatar({ url, name, showBorder = true, className, ...rest }: Props) {
   const nameFirstLetter = name?.charAt(0) || 'A';
 
+  const classes = twMerge(
+    twUserAvatarContainer, className, showBorder && 'border-[#E6E6E6] border-[1px]'
+  );
+
   return (
-    <div className={twMerge(
-        twUserAvatarContainer,
-        className,
-        showBorder && 'border-[#E6E6E6] border-[1px]',
-      )}
-      { ...rest }
-    >
+    <div className={classes} { ...rest }>
 
       {url ? (
         <Image

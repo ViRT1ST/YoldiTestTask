@@ -11,12 +11,12 @@ import { auth, unstable_update } from '@/lib/auth/next-auth';
 import cloudinary from '@/lib/cloudinary/config';
 import dbQueries from '@/lib/db/queries';
 
-interface ChangeProfileImageProps {
+type Props = {
   formData: FormData;
   imageToChange: 'avatar' | 'cover';
-}
+};
 
-export async function changeProfileImage({ formData, imageToChange }: ChangeProfileImageProps) {
+export async function changeProfileImage({ formData, imageToChange }: Props) {
   const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;

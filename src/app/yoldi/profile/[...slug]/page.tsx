@@ -19,18 +19,18 @@ const defaultAboutText = `
   лишь показать наличие самого текста или продемонстрировать типографику в деле.
 `.replace(/\s+/g, ' ').trim();
 
-interface ProfilePageProps {
+type Props = {
   params: {
     slug: string[];
   };
-}
+};
 
-export default async function ProfilePage(props: ProfilePageProps) {
+export default async function ProfilePage({ params }: Props) {
   const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 
-  const slug = props.params.slug[0];
+  const slug = params.slug[0];
 
   // redirect if user is not logged and wants to access "current" user profile
   if (slug === 'me' && !sessionUuid) {

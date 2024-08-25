@@ -18,11 +18,11 @@ export const authConstants = {
   authPagePath: '/yoldi/auth',
 };
 
-interface YoldiLayoutProps {
+type Props = {
   children: React.ReactNode;
-}
+};
 
-export default async function YoldiLayout({ children }: YoldiLayoutProps) {
+export default async function YoldiLayout({ children }: Props) {
   const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
 

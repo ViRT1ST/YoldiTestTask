@@ -2,11 +2,11 @@
 
 import { SessionProvider } from 'next-auth/react';
 
-interface BodyProvidersProps {
+type Props = {
   children: React.ReactNode;
-}
+};
 
-export default function BodyProviders({ children }: BodyProvidersProps) {
+export default function BodyProviders({ children }: Props) {
   return (
     <SessionProvider>
       {children}

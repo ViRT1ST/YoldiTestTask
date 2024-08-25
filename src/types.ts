@@ -126,7 +126,7 @@ export type DataToShowProfile = {
 }
 
 export type ProfileNewInfo = {
-  uuid: string;
+  uuid?: string;
   name: string;
   alias: string;
   about: string;

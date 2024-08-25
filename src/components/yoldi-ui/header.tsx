@@ -4,7 +4,7 @@ import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
 
-import type { AuthConstants } from '@/types';
+import type { AuthConstants, SessionMainFields } from '@/types';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
 import { HeaderLogo } from '@/components/yoldi-ui/icons';
 import Button from '@/components/yoldi-ui/button';
@@ -12,14 +12,12 @@ import Avatar from '@/components/yoldi-ui/avatar';
 import { classesBeautify } from '@/lib/utils';
 import * as actions from '@/actions';
 
-interface HeaderProps {
-  userData: {
-    [key: string]: any;
-  } | null;
+type Props = {
+  userData: SessionMainFields | null;
   authConstants: AuthConstants;
-}
+};
 
-export default function Header({ userData, authConstants }: HeaderProps) {
+export default function Header({ userData, authConstants }: Props) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();

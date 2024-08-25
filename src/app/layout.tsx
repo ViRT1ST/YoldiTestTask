@@ -45,11 +45,11 @@ const rootLayoutClasses = [
   inter.variable
 ];
 
-interface RootLayoutProps {
-  children: React.ReactNode
-}
+type Props = {
+  children: React.ReactNode;
+};
 
-export default function RootLayout({ children } : RootLayoutProps) {
+export default function RootLayout({ children } : Props) {
   return (
     <html lang="en" className={rootLayoutClasses.join(' ')}>
       <body className="relative">

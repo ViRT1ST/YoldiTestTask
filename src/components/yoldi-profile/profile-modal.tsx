@@ -4,22 +4,23 @@ import { twMerge } from 'tailwind-merge';
 import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
+import type { ProfileNewInfo, DataToShowProfile } from '@/types';
 import Button from '@/components/yoldi-ui/button';
 import { classesBeautify } from '@/lib/utils';
 
-interface ProfileModalProps {
+type Props = {
+  data: DataToShowProfile;
   isOpen: boolean;
-  data: any;
-  onSaveData: (data: any) => void;
+  onSaveData: (data: ProfileNewInfo) => void;
   close: () => void;
-}
+};
 
-export default function ProfileModal({ isOpen, data, onSaveData, close }: ProfileModalProps) {
+export default function ProfileModal({ data, isOpen, onSaveData, close }: Props) {
   const { name, alias, about } = data;
 
   const [nameText, setNameText] = useState(name);
   const [aliasText, setAliasText] = useState(alias);
-  const [aboutText, setAboutText] = useState(about);
+  const [aboutText, setAboutText] = useState(about || '');
 
   useEffect(() => {
     const closeOnEscKey = (e: KeyboardEvent) => {

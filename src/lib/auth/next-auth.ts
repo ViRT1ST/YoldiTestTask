@@ -9,6 +9,7 @@ const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const AUTH_SECRET = process.env.AUTH_SECRET;
 
 if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
   throw new Error('Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET');
@@ -17,8 +18,6 @@ if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
   throw new Error('Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET');
 }
-
-const AUTH_SECRET = process.env.AUTH_SECRET;
 
 if (!AUTH_SECRET) {
   throw new Error('Missing AUTH_SECRET');
@@ -66,7 +65,7 @@ const authOptions: NextAuthConfig = {
 
       return token;
 		},
-		async session({ session, token }): Promise<any> {
+		async session({ session, token }) {
       if (session && token) {
         session.user = token as any;
       }

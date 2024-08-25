@@ -3,7 +3,13 @@
 import { useSession } from 'next-auth/react';
 import * as actions from '@/actions';
 
-function AuthButton({ onClick, label }: { onClick: () => void; label: string }) {
+function AuthButton({
+  onClick,
+  label
+}: {
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  label: string
+}) {
   return (
     <button className="block mx-2 my-2 px-2 py-1 border rounded" onClick={onClick}>
       {label}

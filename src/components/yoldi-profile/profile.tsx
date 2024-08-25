@@ -14,6 +14,7 @@ import {
   PhotoIcon,
   LoadingIcon
 } from '@/components/yoldi-ui/icons';
+import type { DataToShowProfile, ProfileNewInfo } from '@/types';
 import Button from '@/components/yoldi-ui/button';
 import Avatar from '@/components/yoldi-ui/avatar';
 import ProfileModal from '@/components/yoldi-profile/profile-modal';
@@ -34,17 +35,16 @@ const changeCoverData = {
   }
 };
 
-interface ProfileProps {
-  data: any;
-  onSaveData: (data: any) => void
-}
+type Props = {
+  data: DataToShowProfile;
+  onSaveData: (data: ProfileNewInfo) => void
+};
 
-export default function Profile({ data, onSaveData }: ProfileProps) {
+export default function Profile({ data, onSaveData }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const { isAuthenticatedToEdit, providerStamp, name, avatar, cover, about } = data;
-  const nameFirstLetter = name.charAt(0) as string;
   const isCoverExist = !!cover;
 
   const [errorMsg, setErrorMsg] = useState(searchParams.get('error') || null);
@@ -117,7 +117,10 @@ export default function Profile({ data, onSaveData }: ProfileProps) {
         close={() => setIsModalOpen(false)}
       />
 
-      <div className={twCoverContainer} style={cover && { backgroundImage: `url(${cover})` }}>
+      <div
+        className={twCoverContainer}
+        style={{ backgroundImage: isCoverExist ? `url(${cover})` : 'none' }}
+      >
         {isAuthenticatedToEdit && (
           <>
             <input
