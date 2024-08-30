@@ -1,11 +1,11 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
+import { sql } from '@vercel/postgres';
 
 import type { DbUserOrUndef, OauthProviders, DbUser, ProfileNewInfo } from '@/types';
 import { PG_CONFIG } from './config';
 
 const pool = new Pool(PG_CONFIG);
-
 
 /* =============================================================
 Create users table
@@ -48,7 +48,8 @@ async function getAllUsers() {
     ORDER BY id
   `;
 
-  const { rows } = await pool.query(query);
+  // const { rows } = await pool.query(query);
+  const { rows } = await sql`SELECT * FROM users ORDER BY id`;
   return rows as DbUser[];
 }
 
