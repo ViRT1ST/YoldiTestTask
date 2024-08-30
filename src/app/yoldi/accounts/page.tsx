@@ -8,7 +8,7 @@ export const metadata = {
 export default function AccountPage() {
   return (
     <ContentWrapper>
-      <AccountList />
+      {/* <AccountList /> */}
     </ContentWrapper>
   );
 }
