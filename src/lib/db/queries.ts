@@ -1,11 +1,7 @@
-import { sql } from '@vercel/postgres';
-import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 
 import type { DbUserOrUndef, OauthProviders, DbUser, ProfileNewInfo } from '@/types';
-import { PG_DEV_CONFIG } from '@/constants/secret';
-
-const pool = new Pool(PG_DEV_CONFIG);
+import executeQuery from './executor';
 
 /* =============================================================
 Create users table
@@ -34,7 +30,7 @@ async function createUsersTable() {
     );
   `;
 
-  await pool.query(query);
+  await executeQuery(query);
 }
 
 /* =============================================================
@@ -48,8 +44,8 @@ async function getAllUsers() {
     ORDER BY id
   `;
 
-  // const { rows } = await pool.query(query);
-  const { rows } = await sql`SELECT * FROM users ORDER BY id`;
+  const { rows } = await executeQuery(query);
+
   return rows as DbUser[];
 }
 
@@ -61,7 +57,7 @@ async function getUserByUuid(uuid: string) {
     LIMIT 1
   `;
 
-  const { rows } = await pool.query(query, [uuid]);
+  const { rows } = await executeQuery(query, [uuid]);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -75,7 +71,7 @@ async function getUserByAlias(alias: string) {
 
   const lowerAlias = alias.toLowerCase();
 
-  const { rows } = await pool.query(query, [lowerAlias]);
+  const { rows } = await executeQuery(query, [lowerAlias]);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -91,7 +87,7 @@ async function getUserByAuthEmail(email: string) {
     LIMIT 1
   `;
 
-  const { rows } = await pool.query(query, [email]);
+  const { rows } = await executeQuery(query, [email]);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -106,7 +102,7 @@ async function createUserByAuthEmail(
   
   const hashedPassword = await bcrypt.hash(password, 8);
 
-  const { rows } = await pool.query(query, [email, hashedPassword, profileName]);
+  const { rows } = await executeQuery(query, [email, hashedPassword, profileName]);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -122,7 +118,7 @@ async function getUserByAuthId(provider: OauthProviders, id: string) {
     LIMIT 1
   `;
 
-  const { rows } = await pool.query(query, [id]);
+  const { rows } = await executeQuery(query, [id]);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -135,7 +131,7 @@ async function createUserByAuthId(
     RETURNING *
   `;
   
-  const { rows } = await pool.query(query, [provider, id, name, avatar]);
+  const { rows } = await executeQuery(query, [provider, id, name, avatar]);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -168,7 +164,7 @@ async function updateProfileInfo(newInfo: ProfileNewInfo) {
     WHERE uuid = $1
   `;
 
-  const { rows } = await pool.query(query, paramsToPass);
+  const { rows } = await executeQuery(query, paramsToPass);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -179,7 +175,7 @@ async function changeProfileCover(uuid: string, imageUrl: string) {
     WHERE uuid = $1
   `;
 
-  const { rows } = await pool.query(query, [uuid, imageUrl]);
+  const { rows } = await executeQuery(query, [uuid, imageUrl]);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -190,7 +186,7 @@ async function deleteProfileCover(uuid: string) {
     WHERE uuid = $1
   `;
 
-  const { rows } = await pool.query(query, [uuid]);
+  const { rows } = await executeQuery(query, [uuid]);
   return rows[0] as DbUserOrUndef;
 }
 
@@ -201,7 +197,7 @@ async function changeProfileAvatar(uuid: string, imageUrl: string) {
     WHERE uuid = $1
   `;
 
-  const { rows } = await pool.query(query, [uuid, imageUrl]);
+  const { rows } = await executeQuery(query, [uuid, imageUrl]);
   return rows[0] as DbUserOrUndef;
 }
 

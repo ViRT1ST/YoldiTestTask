@@ -1,6 +1,6 @@
 // Don't import this file into client components
 
-const isDevMode = process.env.NEXT_PUBLIC_IS_DEVELOPMENT_MODE === 'true';
+export const isDevMode = process.env.NEXT_PUBLIC_IS_DEVELOPMENT_MODE === 'true';
 
 export const AUTH_CONFIG = {
   secret: process.env.AUTH_SECRET,
