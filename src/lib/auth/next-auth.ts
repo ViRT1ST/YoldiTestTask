@@ -4,6 +4,7 @@ import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
 import { AUTH_CONFIG, GITHUB_OAUTH_CONFIG, GOOGLE_OAUTH_CONFIG } from '@/constants/secret';
+import { ROOT_PATH } from '@/constants/public';
 
 const authOptions: NextAuthConfig = {
   providers: [
@@ -56,7 +57,7 @@ const authOptions: NextAuthConfig = {
 		},
 	},
   pages: {
-    signIn: 'http://localhost:3000/yoldi/auth',
+    signIn: `${ROOT_PATH}/yoldi/auth`,
   },
   session: {
     strategy: 'jwt',  
