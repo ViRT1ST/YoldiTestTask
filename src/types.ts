@@ -1,4 +1,4 @@
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
 
 
 /* =============================================================

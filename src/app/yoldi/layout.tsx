@@ -1,6 +1,6 @@
 import type { SessionWithBaseData } from '@/types';
 import { auth } from '@/lib/auth/next-auth';
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
 import Header from '@/components/yoldi-ui/header';
 import Footer from '@/components/yoldi-ui/footer';
 

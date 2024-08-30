@@ -13,3 +13,10 @@ export async function signOutWithRedirectToAuthPage() {
   });
 }
 
+export async function signOutWithRedirectToPath(path: string) {
+  return auth.signOut({
+    redirectTo: path,
+    redirect: true,
+  });
+}
+

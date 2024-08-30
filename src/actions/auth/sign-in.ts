@@ -1,12 +1,7 @@
 'use server';
 
 import * as auth from '@/lib/auth/next-auth';
-
-const PATH_TO_AUTH_PROCESSOR = '/yoldi/auth/pass';
-
-export async function redirectToAuthPage() {
-  return auth.signIn();
-}
+import { PATH_TO_AUTH_PROCESSOR } from '@/constants/public';
 
 export async function credetialsSignIn(additionalData: object, formData: FormData) {
   const userData = {

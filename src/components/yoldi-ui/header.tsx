@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import type { AuthConstants, SessionMainFields } from '@/types';
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants';
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
 import { HeaderLogo } from '@/components/yoldi-ui/icons';
 import Button from '@/components/yoldi-ui/button';
 import Avatar from '@/components/yoldi-ui/avatar';
