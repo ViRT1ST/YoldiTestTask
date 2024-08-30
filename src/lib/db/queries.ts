@@ -48,8 +48,8 @@ async function getAllUsers() {
     ORDER BY id
   `;
 
-  const { rows } = await pool.query(query);
-  // const { rows } = await sql`SELECT * FROM users ORDER BY id`;
+  // const { rows } = await pool.query(query);
+  const { rows } = await sql`SELECT * FROM users ORDER BY id`;
   return rows as DbUser[];
 }
 

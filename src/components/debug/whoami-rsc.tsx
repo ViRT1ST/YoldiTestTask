@@ -5,7 +5,7 @@ import { ROOT_PATH } from '@/constants/public';
 export default async function WhoAmIRSC() {
   const { user } = await fetch(`${ROOT_PATH}/api/debug`, {
     method: 'GET',
-    headers: headers(),
+    headers: new Headers(headers())
   }).then((res) => res.json());
 
   return (
