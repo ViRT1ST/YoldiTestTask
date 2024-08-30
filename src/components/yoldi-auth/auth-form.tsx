@@ -21,11 +21,13 @@ const pageDataSwitch = {
     title: 'Регистрация\nв Yoldi Agency',
     submitButtonText: 'Создать аккаунт',
     submitButtonTooltip: 'Создать аккаунт используя почту и пароль',
+    updateUrlOnPageLoad: `?method=${REGISTRATION_STRING}`,
   },
   [LOGIN_STRING]: {
     title: 'Вход в Yoldi Agency',
     submitButtonText: 'Войти',
     submitButtonTooltip: 'Войти в аккаунт используя почту и пароль',
+    updateUrlOnPageLoad: `?method=${LOGIN_STRING}`,
   },
 };
 
@@ -71,13 +73,10 @@ export default function AuthForm() {
     : isFieldsFilledForLogin;
 
   useEffect(() => {
-    if (urlErrorMessage) {
-      router.push(`?method=${urlMethod}`);
-      toast.error(urlErrorMessage);
+    if (!urlMethod) {
+      router.push(pageData.updateUrlOnPageLoad);
     }
-
-    setTimeout(() => setErrorMsg(null), 10000);
-  }, [urlErrorMessage]);
+  }, []);
 
   useEffect(() => {
     isRegistrationPage
@@ -85,10 +84,13 @@ export default function AuthForm() {
       : emailInputRef.current?.focus();
   }, [isRegistrationPage]);
 
-  // delete later
-  // useEffect(() => {
-  //   router.push(`?method=${isRegistrationPage ? REGISTRATION_STRING : LOGIN_STRING}`);
-  // }, []);
+  useEffect(() => {
+    if (urlErrorMessage) {
+      router.push(`?method=${urlMethod}`);
+      toast.error(urlErrorMessage);
+    }
+    setTimeout(() => setErrorMsg(null), 10000);
+  }, [urlErrorMessage]);
 
   return (
     <div className={twContainer}>

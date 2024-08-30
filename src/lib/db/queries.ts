@@ -6,6 +6,37 @@ import { PG_CONFIG } from './config';
 
 const pool = new Pool(PG_CONFIG);
 
+
+/* =============================================================
+Create users table
+============================================================= */
+
+async function createUsersTable() {
+  const query = `
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+      uuid UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
+      default_auth_provider TEXT NOT NULL,
+      google_id TEXT DEFAULT NULL,
+      github_id TEXT DEFAULT NULL,
+      auth_email TEXT DEFAULT NULL,
+      auth_password TEXT DEFAULT NULL,
+      alias_default TEXT UNIQUE NOT NULL GENERATED ALWAYS AS ('id'::TEXT || id::TEXT) STORED,
+      alias_custom TEXT DEFAULT NULL,
+      name TEXT NOT NULL DEFAULT 'Anonymous',
+      avatar TEXT DEFAULT NULL,
+      profile_cover TEXT DEFAULT NULL,
+      profile_about TEXT DEFAULT NULL,
+      is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+      is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    );
+  `;
+
+  await pool.query(query);
+}
+
 /* =============================================================
 All users
 ============================================================= */
@@ -174,6 +205,7 @@ async function changeProfileAvatar(uuid: string, imageUrl: string) {
 }
 
 const dbQueries = {
+  createUsersTable,
   getAllUsers,
   getUserByUuid,
   getUserByAlias,
