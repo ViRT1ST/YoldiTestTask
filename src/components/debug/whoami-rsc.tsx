@@ -11,5 +11,4 @@ export default async function WhoAmIRSC() {
   return (
     <div>Who Am I (RSC): {user?.name}</div>
   );
-  return <div>Empty</div>;
 }

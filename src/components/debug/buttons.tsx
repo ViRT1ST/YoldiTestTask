@@ -10,7 +10,7 @@ type AuthButtonProps = {
   label: string
 };
 
-function AuthButton({ onClick, label }: AuthButtonProps) {
+function DebugButton({ onClick, label }: AuthButtonProps) {
   return (
     <button className="block mx-2 my-2 px-2 py-1 border rounded" onClick={onClick}>
       {label}
@@ -18,7 +18,7 @@ function AuthButton({ onClick, label }: AuthButtonProps) {
   );
 }
 
-export default function AuthButtons() {
+export default function Buttons() {
   const router = useRouter();
 
   const session = useSession();
@@ -29,25 +29,29 @@ export default function AuthButtons() {
     if (!user) {
       router.push('/debug');
     }
-    
   }, [session]);
 
   return (
     <div className="mb-20">
       {user ? (
-        <AuthButton
+        <DebugButton
           label={`${name}: [Sign Out]`}
           onClick={() => actions.signOutWithRedirectToPath('/debug')}
         />
       ) : (
-        <AuthButton
+        <DebugButton
           label="Go To Sign In Page"
           onClick={() => router.push('/yoldi/auth')}
         />
       )}
 
-      <AuthButton label="Auth With Google" onClick={() => actions.googleSignIn()} />
-      <AuthButton label="Auth With GitHub" onClick={() => actions.githubSignIn()} />
+      <DebugButton label="Auth With Google" onClick={() => actions.googleSignIn()} />
+      <DebugButton label="Auth With GitHub" onClick={() => actions.githubSignIn()} />
+
+      <DebugButton label="Reset Users Table" onClick={async () => {
+        await actions.resetYoldiUsersTable();
+        await actions.signOut();
+      }} />
     </div>
   );
 }

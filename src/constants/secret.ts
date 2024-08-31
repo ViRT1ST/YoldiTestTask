@@ -1,6 +1,6 @@
 // Don't import this file into client components
 
-export const isDevMode = process.env.NEXT_PUBLIC_IS_DEVELOPMENT_MODE === 'true';
+export const IS_DEV_MODE = process.env.NEXT_PUBLIC_IS_DEVELOPMENT_MODE === 'true';
 
 export const AUTH_CONFIG = {
   secret: process.env.AUTH_SECRET,
@@ -13,10 +13,10 @@ export const GOOGLE_OAUTH_CONFIG = {
 };
 
 export const GITHUB_OAUTH_CONFIG = {
-  clientId: isDevMode
+  clientId: IS_DEV_MODE
     ? process.env.GITHUB_CLIENT_ID_DEVELOPMENT
     : process.env.GITHUB_CLIENT_ID_PRODUCTION,
-  clientSecret: isDevMode
+  clientSecret: IS_DEV_MODE
     ? process.env.GITHUB_CLIENT_SECRET_DEVELOPMENT
     : process.env.GITHUB_CLIENT_SECRET_PRODUCTION,
 };

@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth/next-auth';
 
-import AuthButtons from '@/components/debug/auth-buttons';
+import AuthButtons from '@/components/debug/buttons';
 import WhoAmIAPI from '@/components/debug/whoami-api';
 import WhoAmIRSC from '@/components/debug/whoami-rsc';
 

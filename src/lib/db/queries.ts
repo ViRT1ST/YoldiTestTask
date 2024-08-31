@@ -1,10 +1,11 @@
 import bcrypt from 'bcryptjs';
 
 import type { DbUserOrUndef, OauthProviders, DbUser, ProfileNewInfo } from '@/types';
+import { defaultYoldiUsers } from '@/lib/db/reset-data/yoldi';
 import executeQuery from './executor';
 
 /* =============================================================
-Create users table
+Create users table or clear it
 ============================================================= */
 
 async function createUsersTable() {
@@ -29,6 +30,12 @@ async function createUsersTable() {
       updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
     );
   `;
+
+  await executeQuery(query);
+}
+
+async function clearUsersTable() {
+  const query = `TRUNCATE users;`;
 
   await executeQuery(query);
 }
@@ -201,8 +208,37 @@ async function changeProfileAvatar(uuid: string, imageUrl: string) {
   return rows[0] as DbUserOrUndef;
 }
 
+async function resetUsersTable() {
+  try {
+    await createUsersTable();
+    await clearUsersTable();
+
+    type UserForMapping = {
+      [key: string]: any;
+    };
+
+    // Get the columns from the first user
+    const columns = Object.keys(defaultYoldiUsers[0]);
+
+    // Create array vith concatenated values as string
+    const values = defaultYoldiUsers.map((user: UserForMapping) => (
+      `(${columns.map((c) => user[c] !== null ? `'${user[c]}'` : 'NULL').join(', ')})`
+    ));
+
+    const query = `
+      INSERT INTO users (${columns.join(', ')})
+      VALUES ${values.join(', ')};
+    `;
+
+    await executeQuery(query);
+  } catch {
+    // Silence the error
+  }
+}
+
 const dbQueries = {
   createUsersTable,
+  clearUsersTable,
   getAllUsers,
   getUserByUuid,
   getUserByAlias,
@@ -213,7 +249,8 @@ const dbQueries = {
   updateProfileInfo,
   changeProfileCover,
   deleteProfileCover,
-  changeProfileAvatar
+  changeProfileAvatar,
+  resetUsersTable
 };
 
 export default dbQueries;
