@@ -2,9 +2,7 @@
 
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
-// import { revalidatePath } from 'next/cache';
-
-import { Session } from 'next-auth';
+import { revalidatePath } from 'next/cache';
 
 import type {
   ProfileNewInfo,
@@ -21,6 +19,7 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
   const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
+  const sessionAlias = sessionUser?.alias;
 
   let returnError: ErrorForRedirect = null;
 
@@ -34,12 +33,12 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
         .string()
         .trim()
         .min(3, { message: 'URL alias must be at least 3 characters'})
-        .refine(
-          (value) => /^[^id][a-zA-Z0-9]+$/.test(value ?? ''), {
-            message: 'URL alias must contain only letters and numbers and cannot start with "id"'
-        }),
-        // .optional()
-        // .or(z.literal('')),
+        // .refine(
+        //   (value) => /^[^id][a-zA-Z0-9]+$/.test(value ?? ''), {
+        //     message: 'URL alias must contain only letters and numbers and cannot start with "id"'
+        // }),
+        .optional()
+        .or(z.literal('')),
       about: z
         .string()
         .min(1, { message: 'About must be at least 1 characters'})
@@ -57,7 +56,7 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
       } else {
         const { name, alias, about } = result.data;
         const fixedAbout = about.replace(/\s+/g, ' ');
-        const fixedAlias = alias.toLowerCase();
+        const fixedAlias = alias && alias.toLowerCase() || sessionAlias as string;
 
         // Find user with same custom alias
         const userWithSameAlias = await dbQueries.getUserByAlias(fixedAlias);
@@ -66,19 +65,44 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
           throw new ExtendedError(400, 'URL alias already in use');
         }
 
-        await dbQueries.updateProfileInfo({
+        const newInfo: ProfileNewInfo = {
           uuid: sessionUuid,
           name: name,
-          alias: fixedAlias,
-          about: fixedAbout
-        });
+          about: fixedAbout,
+        };
+
+        // Validate URL alias
+        const isValidAlias = /^[^id][a-zA-Z0-9]+$/.test(fixedAlias);
+        const isSameAliasAsSession = fixedAlias === sessionAlias;
+
+        if (!isSameAliasAsSession && !isValidAlias) {
+          throw new ExtendedError(
+            400,
+            'URL alias must contain only letters and numbers and cannot start with "id"'
+          );
+        }
+
+        if (!isSameAliasAsSession) {
+          newInfo.alias = fixedAlias;
+        }
+
+        // Update user profile
+        const dbUser = await dbQueries.updateProfileInfo(newInfo);
+
+        // revalidate cache
+        if (dbUser) {
+          revalidatePath(`/page/profile/${dbUser.alias_default}`);
+          if (dbUser.alias_custom) {
+            revalidatePath(`/page/profile/${dbUser.alias_custom}`);
+          }
+        }
 
         const updateData: SessionWithUpdateData = {
           user: {
             replace_data: {
               ...sessionUser,
               name: name,
-              alias: fixedAlias
+              alias: newInfo?.alias || sessionAlias,
             }
           }
         };
@@ -98,8 +122,8 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
   const code = returnError?.code;
 
   const redirectUrl = message && code
-    ? `/yoldi/profile?error=${message}&code=${code}`
-    : `/yoldi/profile`;
+    ? `/page/profile?error=${message}&code=${code}`
+    : `/page/profile`;
 
   redirect(redirectUrl);
 }

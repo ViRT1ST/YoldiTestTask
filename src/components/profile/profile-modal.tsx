@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import type { ProfileNewInfo, DataToShowProfile } from '@/types';
-import Button from '@/components/yoldi-ui/button';
 import { classesBeautify } from '@/lib/utils';
+import Button from '@/components/[common-ui]/button';
 
 type Props = {
   data: DataToShowProfile;
@@ -19,7 +19,7 @@ export default function ProfileModal({ data, isOpen, onSaveData, close }: Props)
   const { name, alias, about } = data;
 
   const [nameText, setNameText] = useState(name);
-  const [aliasText, setAliasText] = useState(alias);
+  const [aliasText, setAliasText] = useState('');
   const [aboutText, setAboutText] = useState(about || '');
 
   useEffect(() => {
@@ -74,6 +74,7 @@ export default function ProfileModal({ data, isOpen, onSaveData, close }: Props)
               className={twMerge(twInput, 'z-20 absolute mb-0 pl-[165px] bg-transparent')}  
               value={aliasText}
               onChange={(e) => setAliasText(e.target.value)}
+              placeholder={alias}
             />
           </div>
         </div>

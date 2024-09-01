@@ -1,5 +1,5 @@
-import ContentWrapper from '@/components/body-children/content-wrapper';
-import AuthForm from '@/components/yoldi-auth/auth-form';
+import ContentWrapper from '@/components/[body-children]/content-wrapper';
+import AuthForm from '@/components/auth/auth-form';
 
 export const metadata = {
   title: 'Yoldi Auth Page',

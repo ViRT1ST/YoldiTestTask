@@ -57,7 +57,7 @@ const authOptions: NextAuthConfig = {
 		},
 	},
   pages: {
-    signIn: `${ROOT_PATH}/yoldi/auth`,
+    signIn: `${ROOT_PATH}/page/auth`,
   },
   session: {
     strategy: 'jwt',  

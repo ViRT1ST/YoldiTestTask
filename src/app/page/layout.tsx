@@ -1,21 +1,21 @@
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
 import type { SessionWithBaseData } from '@/types';
 import { auth } from '@/lib/auth/next-auth';
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
-import Header from '@/components/yoldi-ui/header';
-import Footer from '@/components/yoldi-ui/footer';
+import Header from '@/components/[common-ui]/header';
+import Footer from '@/components/[common-ui]/footer';
 
 export const authConstants = {
   [LOGIN_STRING]: {
     question: 'Уже есть аккаунт?',
     label: 'Войти',
-    path: '/yoldi/auth?method=login'
+    path: '/page/auth?method=login'
   },
   [REGISTRATION_STRING]: {
     question: 'Уже есть аккаунт?',
     label: 'Зарегистрироваться',
-    path: '/yoldi/auth?method=registration'
+    path: '/page/auth?method=registration'
   },
-  authPagePath: '/yoldi/auth',
+  authPagePath: '/page/auth',
 };
 
 type Props = {

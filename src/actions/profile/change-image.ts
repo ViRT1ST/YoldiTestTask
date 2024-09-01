@@ -81,8 +81,8 @@ export async function changeProfileImage({ formData, imageToChange }: Props) {
   const code = returnError?.code;
 
   const redirectUrl = message && code
-    ? `/yoldi/profile?error=${message}&code=${code}`
-    : `/yoldi/profile`;
+    ? `/page/profile?error=${message}&code=${code}`
+    : `/page/profile`;
 
   redirect(redirectUrl);
 }

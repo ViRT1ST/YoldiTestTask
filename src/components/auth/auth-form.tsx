@@ -10,8 +10,8 @@ import {
   EmailIcon,
   PasswordIcon,
   PasswordVisibilityIcon
-} from '@/components/yoldi-ui/icons';
-import Button from '@/components/yoldi-ui/button';
+} from '@/components/[common-ui]/icons';
+import Button from '@/components/[common-ui]/button';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
 import { classesBeautify } from '@/lib/utils';
 import * as actions from '@/actions';

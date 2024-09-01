@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
 import type { DbUser } from '@/types';
-import dbQueries from '@/lib/db/queries';
-import Avatar from '@/components/yoldi-ui/avatar';
-import ContentLimiter from '@/components/body-children/content-limiter';
 import { classesBeautify, makeUserProviderStamp } from '@/lib/utils';
+import dbQueries from '@/lib/db/queries';
+import ContentLimiter from '@/components/[body-children]/content-limiter';
+import Avatar from '@/components/[common-ui]/avatar';
 
 export default async function AccountList() {
   const dbUsers = await dbQueries.getAllUsers();
@@ -20,7 +20,7 @@ export default async function AccountList() {
         <ul className={twList}>
           {dbUsers.map((user: DbUser) => (
             <li key={user.id} className={twItem}>
-              <Link className={twItemContainer} href={`/yoldi/profile/${user.alias_default}`}>
+              <Link className={twItemContainer} href={`/page/profile/${user.alias_default}`}>
 
                 <Avatar
                   className="w-[50px] h-[50px] ml-[1px]"

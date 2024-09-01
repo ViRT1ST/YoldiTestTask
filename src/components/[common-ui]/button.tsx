@@ -1,5 +1,4 @@
 import { twMerge } from 'tailwind-merge';
-import { classesBeautify } from '@/lib/utils';
 
 type Props = React.ComponentProps<'button'> & {
   colors?: 'light' | 'dark';

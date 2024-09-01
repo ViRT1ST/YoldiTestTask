@@ -16,8 +16,8 @@ export default function RedirectToProfileSlug({ searchParams }: Props) {
   const code = searchParams?.code;
 
   const redirectUrl = error && code
-    ? `/yoldi/profile/me?error=${error}&code=${code}`
-    : `/yoldi/profile/me`;
+    ? `/page/profile/me?error=${error}&code=${code}`
+    : `/page/profile/me`;
   
   redirect(redirectUrl);
 }

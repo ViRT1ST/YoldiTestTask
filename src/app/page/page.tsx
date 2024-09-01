@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Portfolio Main Page',
+  title: 'Yoldi Main Page',
 };
 
 export default function MainPage() {
-  redirect('/yoldi/accounts');
+  redirect('/page/accounts');
 }

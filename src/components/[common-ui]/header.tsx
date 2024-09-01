@@ -6,10 +6,10 @@ import Link from 'next/link';
 
 import type { AuthConstants, SessionMainFields } from '@/types';
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
-import { HeaderLogo } from '@/components/yoldi-ui/icons';
-import Button from '@/components/yoldi-ui/button';
-import Avatar from '@/components/yoldi-ui/avatar';
 import { classesBeautify } from '@/lib/utils';
+import { HeaderLogo } from '@/components/[common-ui]/icons';
+import Button from '@/components/[common-ui]/button';
+import Avatar from '@/components/[common-ui]/avatar';
 import * as actions from '@/actions';
 
 type Props = {
@@ -22,6 +22,7 @@ export default function Header({ userData, authConstants }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
+  const isDebugPage = pathname.includes('/page/debug');
   const isAuthPage = pathname === authConstants.authPagePath;
   const isRegistrationPage = searchParams.get('method') === REGISTRATION_STRING;
   
@@ -37,25 +38,36 @@ export default function Header({ userData, authConstants }: Props) {
 
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
 
-  const handleAuthButton = () => {
-    router.push(pageData.path);
-  };
-
   const handleAvatarMenuClick = () => {
     setIsAvatarMenuOpen(!isAvatarMenuOpen);
   };
 
-  const handleLogout = () => {
+  const handleAuthButton = () => {
+    setIsAvatarMenuOpen(false);
+    router.push(pageData.path);
+  };
+
+  const handleAvatarMenuLogout = () => {
     setIsAvatarMenuOpen(false);
     actions.signOutWithRedirectToAuthPage();
   };
+
+  const handleAvatarMenuGoToProfile = () => {
+    setIsAvatarMenuOpen(false);
+    router.push('/page/profile/me');
+  };
+
+
+  if (isDebugPage) {
+    return null;
+  }
 
   return (
     <div className={twHeaderContainer}>
 
       <div className={twLogoArea}>
         <div className={twLogoContainer}>
-        <Link href="/yoldi">
+        <Link href="/page/accounts">
           <HeaderLogo />
         </Link>
         </div>
@@ -75,14 +87,22 @@ export default function Header({ userData, authConstants }: Props) {
             </button>
 
             {isAvatarMenuOpen && (
-              <Button
-                className="absolute top-[70px] right-0 z-50"
-                colors="light"
-                size="normal"
-                onClick={handleLogout}
-              >
-                Выйти
-              </Button>
+              <div className={twAvatarMenu}>
+                <Button
+                  colors="light"
+                  size="normal"
+                  onClick={handleAvatarMenuGoToProfile}
+                >
+                  Профиль
+                </Button>
+                <Button
+                  colors="light"
+                  size="normal"
+                  onClick={handleAvatarMenuLogout}
+                >
+                  Выйти
+                </Button>
+              </div>
             )}
           </>
         ) : (
@@ -134,4 +154,10 @@ const twUserName = classesBeautify(`
 
 const twUserAvatarContainer = classesBeautify(`
   w-[50px] h-[50px] mt-[1px] ml-5
+`);
+
+const twAvatarMenu = classesBeautify(`
+  z-50 absolute top-[70px] right-0 px-2 py-4
+  flex flex-col gap-2 
+  bg-gray-100 border rounded-[5px] border-[#E6E6E6]
 `);

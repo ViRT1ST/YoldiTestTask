@@ -1,13 +1,13 @@
 import { Open_Sans, Lato, Roboto, Inter } from 'next/font/google';
 
-import ToastifyContainer from '@/components/body-children/toastify-container';
-import ModalContaner from '@/components/body-children/modal-container';
-import BodyProviders from '@/components/body-children/body-providers';
+import ToastifyContainer from '@/components/[body-children]/toastify-container';
+import ModalContaner from '@/components/[body-children]/modal-container';
+import BodyProviders from '@/components/[body-children]/body-providers';
 
 import './globals.css';
 
 export const metadata = {
-  title: 'Portfolio 3.0'
+  title: 'Yoldi Test Task Project'
 };
 
 const open_sans = Open_Sans({

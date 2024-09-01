@@ -11,8 +11,8 @@ export default function WhoAmIAPI() {
       .then(({ user }) => {
         setName(user?.name);
       });
-  }, []);
-  
+  });
+
   return (
     <div>Who Am I (Client): {name}</div>
   );

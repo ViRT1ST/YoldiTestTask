@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 import type { DbUserOrUndef, OauthProviders, DbUser, ProfileNewInfo } from '@/types';
-import { defaultYoldiUsers } from '@/lib/db/reset-data/yoldi';
+import { defaultUsers } from '@/lib/db/populate/users';
 import executeQuery from './executor';
 
 /* =============================================================
@@ -10,7 +10,7 @@ Create users table or clear it
 
 async function createUsersTable() {
   const query = `
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE IF NOT EXISTS yoldi_users (
       id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
       uuid UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
       default_auth_provider TEXT NOT NULL,
@@ -35,7 +35,7 @@ async function createUsersTable() {
 }
 
 async function clearUsersTable() {
-  const query = `TRUNCATE users;`;
+  const query = `TRUNCATE yoldi_users;`;
 
   await executeQuery(query);
 }
@@ -47,7 +47,7 @@ All users
 async function getAllUsers() {
   const query = `
     SELECT *
-    FROM users
+    FROM yoldi_users
     ORDER BY id
   `;
 
@@ -59,7 +59,7 @@ async function getAllUsers() {
 async function getUserByUuid(uuid: string) {
   const query = `
     SELECT *
-    FROM users
+    FROM yoldi_users
     WHERE uuid = $1
     LIMIT 1
   `;
@@ -71,7 +71,7 @@ async function getUserByUuid(uuid: string) {
 async function getUserByAlias(alias: string) {
   const query = `
     SELECT *
-    FROM users
+    FROM yoldi_users
     WHERE alias_default = $1 OR alias_custom = $1
     LIMIT 1
   `;
@@ -89,7 +89,7 @@ Users with authentication by email and password
 async function getUserByAuthEmail(email: string) {
   const query = `
     SELECT *
-    FROM users
+    FROM yoldi_users
     WHERE LOWER(auth_email) = LOWER($1)
     LIMIT 1
   `;
@@ -102,7 +102,7 @@ async function createUserByAuthEmail(
   email: string, password: string, profileName: string = 'Anonymous'
 ) {
   const query = `
-    INSERT INTO users (default_auth_provider, auth_email, auth_password, name)
+    INSERT INTO yoldi_users (default_auth_provider, auth_email, auth_password, name)
     VALUES ('credentials', $1, $2, $3)
     RETURNING *
   `;
@@ -120,7 +120,7 @@ Users with authentication by third party auth providers
 async function getUserByAuthId(provider: OauthProviders, id: string) {
   const query = `
     SELECT *
-    FROM users
+    FROM yoldi_users
     WHERE ${provider}_id = ($1)::TEXT
     LIMIT 1
   `;
@@ -133,7 +133,7 @@ async function createUserByAuthId(
   provider: OauthProviders, id: string, name: string = 'Anonymous', avatar: string
 ) {
   const query = `
-    INSERT INTO users (default_auth_provider, ${provider}_id, name, avatar)
+    INSERT INTO yoldi_users (default_auth_provider, ${provider}_id, name, avatar)
     VALUES ($1, $2, $3, $4)
     RETURNING *
   `;
@@ -166,7 +166,7 @@ async function updateProfileInfo(newInfo: ProfileNewInfo) {
   }
 
   const query = `
-    UPDATE users
+    UPDATE yoldi_users
     SET updated_at = NOW(), ${paramsForSet.join(', ')}
     WHERE uuid = $1
   `;
@@ -177,7 +177,7 @@ async function updateProfileInfo(newInfo: ProfileNewInfo) {
 
 async function changeProfileCover(uuid: string, imageUrl: string) {
   const query = `
-    UPDATE users
+    UPDATE yoldi_users
     SET profile_cover = $2
     WHERE uuid = $1
   `;
@@ -188,7 +188,7 @@ async function changeProfileCover(uuid: string, imageUrl: string) {
 
 async function deleteProfileCover(uuid: string) {
   const query = `
-    UPDATE users
+    UPDATE yoldi_users
     SET profile_cover = NULL
     WHERE uuid = $1
   `;
@@ -199,7 +199,7 @@ async function deleteProfileCover(uuid: string) {
 
 async function changeProfileAvatar(uuid: string, imageUrl: string) {
   const query = `
-    UPDATE users
+    UPDATE yoldi_users
     SET avatar = $2
     WHERE uuid = $1
   `;
@@ -218,15 +218,15 @@ async function resetUsersTable() {
     };
 
     // Get the columns from the first user
-    const columns = Object.keys(defaultYoldiUsers[0]);
+    const columns = Object.keys(defaultUsers[0]);
 
     // Create array vith concatenated values as string
-    const values = defaultYoldiUsers.map((user: UserForMapping) => (
+    const values = defaultUsers.map((user: UserForMapping) => (
       `(${columns.map((c) => user[c] !== null ? `'${user[c]}'` : 'NULL').join(', ')})`
     ));
 
     const query = `
-      INSERT INTO users (${columns.join(', ')})
+      INSERT INTO yoldi_users (${columns.join(', ')})
       VALUES ${values.join(', ')};
     `;
 
@@ -237,8 +237,6 @@ async function resetUsersTable() {
 }
 
 const dbQueries = {
-  createUsersTable,
-  clearUsersTable,
   getAllUsers,
   getUserByUuid,
   getUserByAlias,

@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 
 import type { SessionWithBaseData, ErrorForRedirect } from '@/types';
-import { changeProfileImage } from '@/actions/profile/change-image';
+import { changeProfileImage } from './change-image';
 import { auth } from '@/lib/auth/next-auth';
 import dbQueries from '@/lib/db/queries';
 
@@ -34,8 +34,8 @@ export async function deleteProfileCover() {
   const code = returnError?.code;
 
   const redirectUrl = message && code
-    ? `/yoldi/profile?error=${message}&code=${code}`
-    : `/yoldi/profile`;
+    ? `/page/profile?error=${message}&code=${code}`
+    : `/page/profile`;
 
   redirect(redirectUrl);
 }

@@ -1,6 +1,5 @@
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
 
-
 /* =============================================================
 Database Schemas And Types
 ============================================================= */
@@ -35,25 +34,18 @@ Other Types
 //   [key: string]: any;
 // };
 
-export type AnyFieldsObject = Record<string, string>
+// export type AnyFieldsObject = Record<string, string>
+
+// export type AuthFormData = {
+//   name: string | null,
+//   email: string,
+//   password: string,
+//   isRegistrationPage: boolean,
+// }
 
 export type OauthProviders = (
   'google' | 'github'
 );
-
-export type ApiResponse = {
-  success: boolean;
-  code: number | string;
-  data: object | null;
-  message: string | null;
-};
-
-export type AuthFormData = {
-  name: string | null,
-  email: string,
-  password: string,
-  isRegistrationPage: boolean,
-}
 
 export type SessionMainFields = {
   iat?: number;
@@ -65,7 +57,7 @@ export type SessionMainFields = {
   avatar?: string | null;
   alias?: string;
   is_admin?: boolean;
-}
+};
 
 export type SessionWithBaseData = ({
   user: SessionMainFields
@@ -85,7 +77,7 @@ export type SessionWithProviderData = SessionWithBaseData & {
       avatar_url?: string;
     }
   }
-}
+};
 
 export type SessionWithUpdateData = SessionWithBaseData & {
   user: {
@@ -98,7 +90,7 @@ export type SessionWithUpdateData = SessionWithBaseData & {
       is_admin?: boolean
     }
   }
-}
+};
 
 export type AuthConstants = {
   [REGISTRATION_STRING]: {
@@ -112,7 +104,7 @@ export type AuthConstants = {
     path: string;
   };
   authPagePath: string;
-}
+};
 
 export type DataToShowProfile = {
   isAuthenticatedToEdit: boolean;
@@ -123,16 +115,16 @@ export type DataToShowProfile = {
   cover: string | null;
   about: string | null;
   providerStamp: string;
-}
+};
 
 export type ProfileNewInfo = {
   uuid?: string;
   name: string;
-  alias: string;
+  alias?: string;
   about: string;
-}
+};
 
 export type ErrorForRedirect = {
   message: string;
   code: number
-} | null
+} | null;

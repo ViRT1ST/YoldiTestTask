@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation';
 
 import type { SessionWithBaseData, DbUserOrUndef, DataToShowProfile } from '@/types';
-import { auth } from '@/lib/auth/next-auth';
 import { makeUserProviderStamp } from '@/lib/utils';
-import ContentWrapper from '@/components/body-children/content-wrapper';
-import Profile from '@/components/yoldi-profile/profile';
+import { auth } from '@/lib/auth/next-auth';
+import ContentWrapper from '@/components/[body-children]/content-wrapper';
+import Profile from '@/components/profile/profile';
 import dbQueries from '@/lib/db/queries';
 import * as actions from '@/actions';
 
@@ -34,7 +34,7 @@ export default async function ProfilePage({ params }: Props) {
 
   // redirect if user is not logged and wants to access "current" user profile
   if (slug === 'me' && !sessionUuid) {
-    redirect('/yoldi/auth');
+    redirect('/page/auth');
   }
 
   let dbUser: DbUserOrUndef;

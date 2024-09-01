@@ -1,8 +1,8 @@
-import { redirect } from 'next/navigation';
+// import { redirect } from 'next/navigation';
 
 export default function NotFoundPage() {
   // redirect('/error');
   return (
-    <div>Error</div>
+    <div className="mx-10">Error</div>
   );
 }

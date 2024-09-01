@@ -1,6 +1,7 @@
 'use server';
 
 import bcrypt from 'bcryptjs';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
@@ -15,6 +16,7 @@ import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
 import { ExtendedError } from '@/errors';
 import dbQueries from '@/lib/db/queries';
 
+
 const defaultError = { message: 'Failed to authenticate', code: 401 };
 
 export async function authorizeUser() {
@@ -22,7 +24,7 @@ export async function authorizeUser() {
 
   if (!session) {
     return signOut({
-      redirectTo: `/yoldi/auth?error=${defaultError.message}&code=${defaultError.code}`
+      redirectTo: `/page/auth?error=${defaultError.message}&code=${defaultError.code}`
     });
   }
 
@@ -31,7 +33,7 @@ export async function authorizeUser() {
 
   if (!providerData) {
     return signOut({
-      redirectTo: `/yoldi/auth?error=${defaultError.message}&code=${defaultError.code}`
+      redirectTo: `/page/auth?error=${defaultError.message}&code=${defaultError.code}`
     });
   }
 
@@ -91,6 +93,12 @@ export async function authorizeUser() {
 
             if (!dbUser) {
               throw new ExtendedError(400, 'Error creating new user');
+            } else {
+              // all ok, revalidate cache
+              revalidatePath(`/page/profile/${dbUser.alias_default}`);
+              if (dbUser.alias_custom) {
+                revalidatePath(`/page/profile/${dbUser.alias_custom}`);
+              }
             }
           }
         }
@@ -130,6 +138,12 @@ export async function authorizeUser() {
 
             if (!match) {
               throw new ExtendedError(400, 'Password is invalid');
+            } else {
+              // all ok, revalidate cache
+              revalidatePath(`/page/profile/${dbUser.alias_default}`);
+              if (dbUser.alias_custom) {
+                revalidatePath(`/page/profile/${dbUser.alias_custom}`);
+              }
             }
           }
         }
@@ -186,6 +200,12 @@ export async function authorizeUser() {
 
           if (!dbUser) {
             throw new ExtendedError(400, 'Error creating new user');
+          } else {
+            // all ok, revalidate cache
+            revalidatePath(`/page/profile/${dbUser.alias_default}`);
+            if (dbUser.alias_custom) {
+              revalidatePath(`/page/profile/${dbUser.alias_custom}`);
+            }
           }
         }
 
@@ -229,9 +249,9 @@ export async function authorizeUser() {
     const code = `code=${authError.code}`;
 
     return signOut({
-      redirectTo: `/yoldi/auth?${method}&${error}&${code}`
+      redirectTo: `/page/auth?${method}&${error}&${code}`
     });
   }
 
-  redirect('/yoldi/profile/me');
+  redirect('/page/profile/me');
 }

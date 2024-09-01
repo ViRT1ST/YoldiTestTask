@@ -2,6 +2,6 @@
 
 import dbQueries from '@/lib/db/queries';
 
-export async function resetYoldiUsersTable() {
+export async function resetUsersTable() {
   await dbQueries.resetUsersTable();
 }

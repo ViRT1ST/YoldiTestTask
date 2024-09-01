@@ -6,14 +6,14 @@ export default async function middleware(req: NextRequest) {
 
   // redirect if user is not logged (for matcher's urls) 
   if (!session) {
-    // `/yoldi/auth?callbackUrl=${path}`
-    return NextResponse.redirect(new URL(`/yoldi/auth`, req.url));
+    // `/page/auth?callbackUrl=${path}`
+    return NextResponse.redirect(new URL(`/page/auth`, req.url));
   }
   
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/yoldi/profile/me']
+  matcher: ['/page/profile/me']
 };
 

@@ -13,12 +13,12 @@ import {
   UploadTrashIcon,
   PhotoIcon,
   LoadingIcon
-} from '@/components/yoldi-ui/icons';
+} from '@/components/[common-ui]/icons';
 import type { DataToShowProfile, ProfileNewInfo } from '@/types';
-import Button from '@/components/yoldi-ui/button';
-import Avatar from '@/components/yoldi-ui/avatar';
-import ProfileModal from '@/components/yoldi-profile/profile-modal';
-import ContentLimiter from '@/components/body-children/content-limiter';
+import Button from '@/components/[common-ui]/button';
+import Avatar from '@/components/[common-ui]/avatar';
+import ProfileModal from '@/components/profile/profile-modal';
+import ContentLimiter from '@/components/[body-children]/content-limiter';
 import { classesBeautify } from '@/lib/utils';
 import * as actions from '@/actions';
 
@@ -63,7 +63,7 @@ export default function Profile({ data, onSaveData }: Props) {
   useEffect(() => {
     if (errorMsg) {
       // hide url params after error
-      router.push('/yoldi/profile/me'); 
+      router.push('/page/profile/me'); 
       toast.error(errorMsg);
     }
 

@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth/next-auth';
 
-import AuthButtons from '@/components/debug/buttons';
+import DebugButtons from '@/components/debug/buttons';
 import WhoAmIAPI from '@/components/debug/whoami-api';
 import WhoAmIRSC from '@/components/debug/whoami-rsc';
 
@@ -20,7 +20,7 @@ export default async function DebugPage() {
       <WhoAmIAPI />
       <WhoAmIRSC />
       <div>-------------------------------------------------</div>
-      <AuthButtons />
+      <DebugButtons />
     </main>
   );
 }
