@@ -13,20 +13,20 @@ const authOptions: NextAuthConfig = {
       credentials: {
         name: { label: 'Name', type: 'name' },
         email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials): Promise<object | null> {
         return credentials;
-      },
+      }
     }),
     GitHub({
       clientId: GITHUB_OAUTH_CONFIG.clientId,
-      clientSecret: GITHUB_OAUTH_CONFIG.clientSecret,
+      clientSecret: GITHUB_OAUTH_CONFIG.clientSecret
     }),
     Google({
       clientId: GOOGLE_OAUTH_CONFIG.clientId,
-      clientSecret: GOOGLE_OAUTH_CONFIG.clientSecret,
-    }),
+      clientSecret: GOOGLE_OAUTH_CONFIG.clientSecret
+    })
   ],
   callbacks: {
     async jwt({ token, user, account, profile, trigger, session }) {
@@ -43,33 +43,27 @@ const authOptions: NextAuthConfig = {
       }
 
       if (trigger === 'update' && session) {
-        token = { ...session.user.replace_data };
-      };
+        token = {...session.user.replace_data};
+      }
 
       return token;
-		},
-		async session({ session, token }) {
+    },
+    async session({ session, token }) {
       if (session && token) {
         session.user = token as any;
       }
 
       return session;
-		},
-	},
+    }
+  },
   pages: {
-    signIn: `${ROOT_PATH}/page/auth`,
+    signIn: `${ROOT_PATH}/page/auth`
   },
   session: {
-    strategy: 'jwt',  
+    strategy: 'jwt'
   },
   basePath: AUTH_CONFIG.apiPath,
-  secret: AUTH_CONFIG.secret,
+  secret: AUTH_CONFIG.secret
 };
 
-export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth(authOptions);
-
-// console.log('[jwt] token:', token);
-// console.log('[jwt] user:', user);
-// console.log('[jwt] account:', account);
-// console.log('[jwt] profile:', profile);
-// console.log('[jwt] session:', session);
+export const {handlers, signIn, signOut, auth, unstable_update} = NextAuth(authOptions);

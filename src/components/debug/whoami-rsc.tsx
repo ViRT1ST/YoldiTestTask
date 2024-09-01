@@ -1,5 +1,4 @@
 import { headers } from 'next/headers';
-
 import { ROOT_PATH } from '@/constants/public';
 
 export default async function WhoAmIRSC() {

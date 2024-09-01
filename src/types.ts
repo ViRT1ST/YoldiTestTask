@@ -30,19 +30,6 @@ export type DbUserOrUndef = DbUser | undefined;
 Other Types
 ============================================================= */
 
-// export type AnyFieldsObject = {
-//   [key: string]: any;
-// };
-
-// export type AnyFieldsObject = Record<string, string>
-
-// export type AuthFormData = {
-//   name: string | null,
-//   email: string,
-//   password: string,
-//   isRegistrationPage: boolean,
-// }
-
 export type OauthProviders = (
   'google' | 'github'
 );

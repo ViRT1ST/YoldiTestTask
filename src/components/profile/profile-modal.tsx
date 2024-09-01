@@ -50,7 +50,6 @@ export default function ProfileModal({ data, isOpen, onSaveData, close }: Props)
       alias: aliasText,
       about: aboutText
     });
-    // window.location.reload();
   };
   
   const modal = (

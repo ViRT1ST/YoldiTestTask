@@ -9,4 +9,3 @@ export default async function MainPage() {
   await actions.resetUsersTable();
   redirect('/page/accounts');
 }
-

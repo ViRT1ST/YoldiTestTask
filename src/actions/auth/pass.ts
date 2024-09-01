@@ -1,7 +1,6 @@
 'use server';
 
 import bcrypt from 'bcryptjs';
-import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
@@ -13,11 +12,14 @@ import type {
 } from '@/types';
 import { auth, signOut, unstable_update} from '@/lib/auth/next-auth';
 import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
+import { revalidateProfilePath } from '@/lib/cache/revalidate';
 import { ExtendedError } from '@/errors';
 import dbQueries from '@/lib/db/queries';
 
-
-const defaultError = { message: 'Failed to authenticate', code: 401 };
+const defaultError = {
+  message: 'Failed to authenticate',
+  code: 401
+};
 
 export async function authorizeUser() {
   let session = await auth() as SessionWithProviderData;
@@ -95,10 +97,7 @@ export async function authorizeUser() {
               throw new ExtendedError(400, 'Error creating new user');
             } else {
               // all ok, revalidate cache
-              revalidatePath(`/page/profile/${dbUser.alias_default}`);
-              if (dbUser.alias_custom) {
-                revalidatePath(`/page/profile/${dbUser.alias_custom}`);
-              }
+              revalidateProfilePath(dbUser);
             }
           }
         }
@@ -140,10 +139,7 @@ export async function authorizeUser() {
               throw new ExtendedError(400, 'Password is invalid');
             } else {
               // all ok, revalidate cache
-              revalidatePath(`/page/profile/${dbUser.alias_default}`);
-              if (dbUser.alias_custom) {
-                revalidatePath(`/page/profile/${dbUser.alias_custom}`);
-              }
+              revalidateProfilePath(dbUser);
             }
           }
         }
@@ -202,10 +198,7 @@ export async function authorizeUser() {
             throw new ExtendedError(400, 'Error creating new user');
           } else {
             // all ok, revalidate cache
-            revalidatePath(`/page/profile/${dbUser.alias_default}`);
-            if (dbUser.alias_custom) {
-              revalidatePath(`/page/profile/${dbUser.alias_custom}`);
-            }
+            revalidateProfilePath(dbUser);
           }
         }
 

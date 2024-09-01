@@ -2,7 +2,6 @@
 
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
 
 import type {
   ProfileNewInfo,
@@ -12,6 +11,7 @@ import type {
 } from '@/types';
 import { auth, unstable_update  } from '@/lib/auth/next-auth';
 import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
+import { revalidateProfilePath } from '@/lib/cache/revalidate';
 import { ExtendedError } from '@/errors';
 import dbQueries from '@/lib/db/queries';
 
@@ -33,10 +33,6 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
         .string()
         .trim()
         .min(3, { message: 'URL alias must be at least 3 characters'})
-        // .refine(
-        //   (value) => /^[^id][a-zA-Z0-9]+$/.test(value ?? ''), {
-        //     message: 'URL alias must contain only letters and numbers and cannot start with "id"'
-        // }),
         .optional()
         .or(z.literal('')),
       about: z
@@ -77,8 +73,7 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
 
         if (!isSameAliasAsSession && !isValidAlias) {
           throw new ExtendedError(
-            400,
-            'URL alias must contain only letters and numbers and cannot start with "id"'
+            400, 'URL alias must contain only letters and numbers and cannot start with "id"'
           );
         }
 
@@ -89,12 +84,9 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
         // Update user profile
         const dbUser = await dbQueries.updateProfileInfo(newInfo);
 
-        // revalidate cache
+        // Revalidate cache
         if (dbUser) {
-          revalidatePath(`/page/profile/${dbUser.alias_default}`);
-          if (dbUser.alias_custom) {
-            revalidatePath(`/page/profile/${dbUser.alias_custom}`);
-          }
+          revalidateProfilePath(dbUser);
         }
 
         const updateData: SessionWithUpdateData = {
