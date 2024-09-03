@@ -34,9 +34,9 @@
 - Авторизированнный пользователь может менять данные своего профиля (аватар, обложка, текст о себе, URL-alias)
 
 ## Доступные пути
-- [/page/accounts](https://virt1st-yoldi.vercel.app/page/accounts) (список пользователей)
-- [/page/auth](https://virt1st-yoldi.vercel.app/page/auth) (форма авторизации)
-- [/profile/me](https://virt1st-yoldi.vercel.app/page/profile/me) (профиль текущего пользователя)
-- [/profile/\[id\]](https://virt1st-yoldi.vercel.app/page/profile/adminvlad) (профили других пользователей через URL-alias)
-- [/page/debug](https://virt1st-yoldi.vercel.app/page/debug) (информация о next-auth-сессии, сброс таблицы пользователей в БД)
+- [/page/accounts](https://virt1st-yoldi.vercel.app/page/accounts) - список пользователей
+- [/page/auth](https://virt1st-yoldi.vercel.app/page/auth) - форма авторизации
+- [/profile/me](https://virt1st-yoldi.vercel.app/page/profile/me) - профиль текущего пользователя
+- [/profile/\[id\]](https://virt1st-yoldi.vercel.app/page/profile/adminvlad) - профили других пользователей через URL-alias
+- [/page/debug](https://virt1st-yoldi.vercel.app/page/debug) - информация о next-auth-сессии, сброс таблицы пользователей в БД
 
