@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-import { CLOUDINARY_CONFIG } from '@/constants/secret';
+import { CLOUDINARY_CONFIG } from '@/config/secret';
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CONFIG.cloud_name,

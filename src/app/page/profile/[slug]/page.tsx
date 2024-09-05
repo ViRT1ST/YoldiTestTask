@@ -1,11 +1,16 @@
 import { redirect } from 'next/navigation';
 
-import type { SessionWithBaseData, DbUserOrUndef, DataToShowProfile } from '@/types';
-import { makeUserProviderStamp } from '@/lib/utils';
-import { auth } from '@/lib/auth/next-auth';
+import type {
+  SessionWithBaseData,
+  DbUserOrUndef,
+  DataToShowProfile,
+  Slug 
+} from '@/types';
+import { makeUserProviderStamp } from '@/utils/users';
+import { auth } from '@/lib/next-auth';
 import ContentWrapper from '@/components/[body-children]/content-wrapper';
 import Profile from '@/components/profile/profile';
-import dbQueries from '@/lib/db/queries';
+import pg from '@/lib/postgres/queries';
 import * as actions from '@/actions';
 
 export const metadata = {
@@ -19,18 +24,12 @@ const defaultAboutText = `
   лишь показать наличие самого текста или продемонстрировать типографику в деле.
 `.replace(/\s+/g, ' ').trim();
 
-type Props = {
-  params: {
-    slug: string[];
-  };
-};
-
-export default async function ProfilePage({ params }: Props) {
+export default async function ProfilePage({ params }: Slug) {
   const session = await auth() as SessionWithBaseData;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 
-  const slug = params.slug[0];
+  const slug = params.slug;
 
   // redirect if user is not logged and wants to access "current" user profile
   if (slug === 'me' && !sessionUuid) {
@@ -41,12 +40,12 @@ export default async function ProfilePage({ params }: Props) {
 
   // db user is same as in session
   if (slug === 'me' && sessionUuid) {
-    dbUser = await dbQueries.getUserByUuid(sessionUuid);
+    dbUser = await pg.getUserByUuid(sessionUuid);
   }
   
   // db user is any user except "current", no matter if current session user exist
   if (slug !== 'me') {
-    dbUser = await dbQueries.getUserByAlias(slug);
+    dbUser = await pg.getUserByAlias(slug);
   }
 
   if (!dbUser) {

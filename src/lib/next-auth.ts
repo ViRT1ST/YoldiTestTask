@@ -3,8 +3,8 @@ import Credentials from 'next-auth/providers/credentials';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
-import { AUTH_CONFIG, GITHUB_OAUTH_CONFIG, GOOGLE_OAUTH_CONFIG } from '@/constants/secret';
-import { ROOT_PATH } from '@/constants/public';
+import { AUTH_CONFIG, GITHUB_OAUTH_CONFIG, GOOGLE_OAUTH_CONFIG } from '@/config/secret';
+import { ROOT_PATH } from '@/config/public';
 
 const authOptions: NextAuthConfig = {
   providers: [

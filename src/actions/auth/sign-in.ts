@@ -1,7 +1,7 @@
 'use server';
 
-import { PATH_TO_AUTH_PROCESSOR } from '@/constants/public';
-import * as auth from '@/lib/auth/next-auth';
+import { PATH_TO_AUTH_PROCESSOR } from '@/config/public';
+import * as auth from '@/lib/next-auth';
 
 export async function credetialsSignIn(additionalData: object, formData: FormData) {
   const userData = {

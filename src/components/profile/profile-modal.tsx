@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import type { ProfileNewInfo, DataToShowProfile } from '@/types';
-import { classesBeautify } from '@/lib/utils';
+import { classesBeautify } from '@/utils/styles';
 import Button from '@/components/[common-ui]/button';
 
 type Props = {
@@ -18,9 +18,9 @@ type Props = {
 export default function ProfileModal({ data, isOpen, onSaveData, close }: Props) {
   const { name, alias, about } = data;
 
-  const [nameText, setNameText] = useState(name);
-  const [aliasText, setAliasText] = useState('');
-  const [aboutText, setAboutText] = useState(about || '');
+  const [ nameText, setNameText ] = useState(name);
+  const [ aliasText, setAliasText ] = useState('');
+  const [ aboutText, setAboutText ] = useState(about || '');
 
   useEffect(() => {
     const closeOnEscKey = (e: KeyboardEvent) => {

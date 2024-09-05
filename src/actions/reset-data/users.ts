@@ -1,7 +1,7 @@
 'use server';
 
-import dbQueries from '@/lib/db/queries';
+import pg from '@/lib/postgres/queries';
 
 export async function resetUsersTable() {
-  await dbQueries.resetUsersTable();
+  await pg.resetUsersTable();
 }

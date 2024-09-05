@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 import type { DbUserOrUndef, OauthProviders, DbUser, ProfileNewInfo } from '@/types';
-import { defaultUsers } from '@/lib/db/populate/users';
+import { defaultUsers } from '@/lib/postgres/populate/users';
 import executeQuery from './executor';
 
 /* =============================================================

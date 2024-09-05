@@ -1,13 +1,14 @@
 import Link from 'next/link';
 
 import type { DbUser } from '@/types';
-import { classesBeautify, makeUserProviderStamp } from '@/lib/utils';
-import dbQueries from '@/lib/db/queries';
+import { makeUserProviderStamp } from '@/utils/users';
+import { classesBeautify } from '@/utils/styles';
+import pg from '@/lib/postgres/queries';
 import ContentLimiter from '@/components/[body-children]/content-limiter';
 import Avatar from '@/components/[common-ui]/avatar';
 
 export default async function AccountList() {
-  const dbUsers = await dbQueries.getAllUsers();
+  const dbUsers = await pg.getAllUsers();
 
   return (
     <ContentLimiter className="flex-col px-[20px]">

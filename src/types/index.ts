@@ -1,4 +1,6 @@
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
+import { z } from 'zod';
+
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/config/public';
 
 /* =============================================================
 Database Schemas And Types
@@ -27,7 +29,23 @@ export type DbUser = {
 export type DbUserOrUndef = DbUser | undefined;
 
 /* =============================================================
-Other Types
+Common
+============================================================= */
+
+export type Slug = {
+  params: {
+    'slug': string
+  }
+};
+
+export type CatchAllSlug = {
+  params: {
+    'slug': string[]
+  }
+};
+
+/* =============================================================
+Other
 ============================================================= */
 
 export type OauthProviders = (

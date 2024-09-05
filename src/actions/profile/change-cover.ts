@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 
 import type { SessionWithBaseData, ErrorForRedirect } from '@/types';
 import { changeProfileImage } from './change-image';
-import { auth } from '@/lib/auth/next-auth';
-import dbQueries from '@/lib/db/queries';
+import { auth } from '@/lib/next-auth';
+import pg from '@/lib/postgres/queries';
 
 export async function changeProfileCover(formData: FormData) {
   await changeProfileImage({ formData, imageToChange: 'cover' });
@@ -20,7 +20,7 @@ export async function deleteProfileCover() {
 
   if (sessionUuid) {
     try {
-      await dbQueries.deleteProfileCover(sessionUuid);
+      await pg.deleteProfileCover(sessionUuid);
       
     } catch (error: any) {
       returnError = {

@@ -1,6 +1,6 @@
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/config/public';
 import type { SessionWithBaseData } from '@/types';
-import { auth } from '@/lib/auth/next-auth';
+import { auth } from '@/lib/next-auth';
 import Header from '@/components/[common-ui]/header';
 import Footer from '@/components/[common-ui]/footer';
 

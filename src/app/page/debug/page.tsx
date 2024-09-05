@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth/next-auth';
+import { auth } from '@/lib/next-auth';
 
 import DebugButtons from '@/components/debug/buttons';
 import WhoAmIAPI from '@/components/debug/whoami-api';

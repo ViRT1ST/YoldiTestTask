@@ -4,8 +4,8 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 import type { AuthConstants } from '@/types';
-import { classesBeautify } from '@/lib/utils';
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
+import { classesBeautify } from '@/utils/styles';
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/config/public';
 
 type Props = {
   authConstants: AuthConstants;

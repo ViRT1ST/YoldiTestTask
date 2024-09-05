@@ -28,7 +28,7 @@ export default function Buttons() {
   const debugPage = '/page/debug';
   const authPage = '/page/auth';
 
-  const [loggedIn, setIsLoggedIn] = useState(false);
+  const [ loggedIn, setIsLoggedIn ] = useState(false);
 
   useEffect(() => {
     setIsLoggedIn(Boolean(name));

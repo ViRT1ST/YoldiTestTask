@@ -10,11 +10,11 @@ import type {
   ErrorForRedirect,
   DbUser
 } from '@/types';
-import { auth, signOut, unstable_update} from '@/lib/auth/next-auth';
-import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
-import { revalidateProfilePath } from '@/lib/cache/revalidate';
-import { ExtendedError } from '@/errors';
-import dbQueries from '@/lib/db/queries';
+import { auth, signOut, unstable_update} from '@/lib/next-auth';
+import { convertErrorZodResultToMsgArray } from '@/utils/zod';
+import { revalidateProfilePath } from '@/utils/cache';
+import { ExtendedError } from '@/utils/errors';
+import pg from '@/lib/postgres/queries';
 
 const defaultError = {
   message: 'Failed to authenticate',
@@ -60,13 +60,16 @@ export async function authorizeUser() {
         const registrationSchema = z.object({
           name: z
             .string()
+            .trim()
             .min(3, { message: 'Name must be at least 5 characters'}),
           email: z
             .string()
+            .trim()
             .email({ message: 'Valid email is required'})
             .min(5, { message: 'Email must be at least 5 characters'}),
           password: z
             .string()
+            .trim()
             .min(8, { message: 'Password must be at least 8 characters'})
         });
 
@@ -79,7 +82,7 @@ export async function authorizeUser() {
 
         // Process user credentials
         } else {
-          dbUser = await dbQueries.getUserByAuthEmail(result.data.email);
+          dbUser = await pg.getUserByAuthEmail(result.data.email);
 
           // Found existing user -> throw error
           // User not found -> new user registration
@@ -87,7 +90,7 @@ export async function authorizeUser() {
             throw new ExtendedError(400, 'User already exists');
 
           } else {
-            dbUser = await dbQueries.createUserByAuthEmail(
+            dbUser = await pg.createUserByAuthEmail(
               result.data.email,
               result.data.password,
               result.data.name
@@ -124,7 +127,7 @@ export async function authorizeUser() {
 
         // Process user credentials
         } else {
-          dbUser = await dbQueries.getUserByAuthEmail(result.data.email);
+          dbUser = await pg.getUserByAuthEmail(result.data.email);
 
           if (!dbUser) {
             throw new ExtendedError(400, 'User not found');
@@ -189,10 +192,10 @@ export async function authorizeUser() {
 
     } else {
       try {
-        dbUser = await dbQueries.getUserByAuthId(authProvider, userId);
+        dbUser = await pg.getUserByAuthId(authProvider, userId);
 
         if (!dbUser) {
-          dbUser = await dbQueries.createUserByAuthId(authProvider, userId, userName, userAvatar);
+          dbUser = await pg.createUserByAuthId(authProvider, userId, userName, userAvatar);
 
           if (!dbUser) {
             throw new ExtendedError(400, 'Error creating new user');

@@ -5,8 +5,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import type { AuthConstants, SessionMainFields } from '@/types';
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
-import { classesBeautify } from '@/lib/utils';
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/config/public';
+import { classesBeautify } from '@/utils/styles';
 import { HeaderLogo } from '@/components/[common-ui]/icons';
 import Button from '@/components/[common-ui]/button';
 import Avatar from '@/components/[common-ui]/avatar';
@@ -36,7 +36,7 @@ export default function Header({ userData, authConstants }: Props) {
   const userNameFull = userData?.name || 'Anonymous';
   const userNameShort = userNameFull.split(' ')[0];
 
-  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+  const [ isAvatarMenuOpen, setIsAvatarMenuOpen ] = useState(false);
 
   const handleAvatarMenuClick = () => {
     setIsAvatarMenuOpen(!isAvatarMenuOpen);

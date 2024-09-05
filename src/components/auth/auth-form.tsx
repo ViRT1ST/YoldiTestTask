@@ -12,8 +12,8 @@ import {
   PasswordVisibilityIcon
 } from '@/components/[common-ui]/icons';
 import Button from '@/components/[common-ui]/button';
-import { REGISTRATION_STRING, LOGIN_STRING } from '@/constants/public';
-import { classesBeautify } from '@/lib/utils';
+import { REGISTRATION_STRING, LOGIN_STRING } from '@/config/public';
+import { classesBeautify } from '@/utils/styles';
 import * as actions from '@/actions';
 
 const pageDataSwitch = {
@@ -52,12 +52,12 @@ export default function AuthForm() {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
 
-  const [name, setName] = useState(defaultInputValues.name);
-  const [email, setEmail] = useState(defaultInputValues.email);
-  const [password, setPassword] = useState(defaultInputValues.password);
-  const [passwordInputType, setPasswordInputType] = useState('password');
+  const [ name, setName ] = useState(defaultInputValues.name);
+  const [ email, setEmail ] = useState(defaultInputValues.email);
+  const [ password, setPassword ] = useState(defaultInputValues.password);
+  const [ passwordInputType, setPasswordInputType ] = useState('password');
 
-  const [errorMsg, setErrorMsg] = useState(urlErrorMessage || null);
+  const [ errorMsg, setErrorMsg ] = useState(urlErrorMessage || null);
   
   const pageData = isRegistrationPage
     ? pageDataSwitch[REGISTRATION_STRING]

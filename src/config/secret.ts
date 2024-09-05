@@ -27,10 +27,10 @@ export const CLOUDINARY_CONFIG = {
   api_secret: process.env.CLOUDINARY_API_SECRET
 };
 
-export const PG_DEV_CONFIG = {
-  host: process.env.PG_DEV_HOST,
+export const PG_LOCAL_CONFIG = {
+  host: process.env.PG_LOCAL_HOST,
   port: 5432,
-  user: process.env.PG_DEV_USER,
-  password: process.env.PG_DEV_PASSWORD,
-  database: process.env.PG_DEV_DATABASE,
+  user: process.env.PG_LOCAL_USER,
+  password: process.env.PG_LOCAL_PASSWORD,
+  database: process.env.PG_LOCAL_DATABASE,
 };

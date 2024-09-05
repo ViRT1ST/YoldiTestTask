@@ -1,7 +1,7 @@
 import { twMerge } from 'tailwind-merge';
 import Image from 'next/image';
 
-import { classesBeautify } from '@/lib/utils';
+import { classesBeautify } from '@/utils/styles';
 
 type Props = React.ComponentProps<'div'> & {
   url: string | null | undefined;

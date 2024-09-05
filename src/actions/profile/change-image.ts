@@ -7,9 +7,9 @@ import type {
   SessionWithUpdateData,
   ErrorForRedirect
 } from '@/types';
-import { auth, unstable_update } from '@/lib/auth/next-auth';
-import cloudinary from '@/lib/cloudinary/config';
-import dbQueries from '@/lib/db/queries';
+import { auth, unstable_update } from '@/lib/next-auth';
+import cloudinary from '@/lib/cloudinary';
+import pg from '@/lib/postgres/queries';
 
 type Props = {
   formData: FormData;
@@ -35,8 +35,8 @@ export async function changeProfileImage({ formData, imageToChange }: Props) {
   }
 
   const dbQuery = imageToChange === 'avatar'
-    ? dbQueries.changeProfileAvatar
-    : dbQueries.changeProfileCover;
+    ? pg.changeProfileAvatar
+    : pg.changeProfileCover;
 
   if (!returnError && sessionUuid && image) {
     try {

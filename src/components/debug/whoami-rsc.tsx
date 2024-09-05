@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { ROOT_PATH } from '@/constants/public';
+import { ROOT_PATH } from '@/config/public';
 
 export default async function WhoAmIRSC() {
   const { user } = await fetch(`${ROOT_PATH}/api/debug`, {

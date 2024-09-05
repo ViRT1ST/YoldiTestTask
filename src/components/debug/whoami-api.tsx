@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export default function WhoAmIAPI() {
-  const [name, setName] = useState(null);
+  const [ name, setName ] = useState(null);
 
   useEffect(() => {
     fetch('/api/debug')

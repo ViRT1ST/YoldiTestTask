@@ -9,11 +9,11 @@ import type {
   SessionWithUpdateData,
   ErrorForRedirect
 } from '@/types';
-import { auth, unstable_update  } from '@/lib/auth/next-auth';
-import { convertErrorZodResultToMsgArray } from '@/lib/utils/index';
-import { revalidateProfilePath } from '@/lib/cache/revalidate';
-import { ExtendedError } from '@/errors';
-import dbQueries from '@/lib/db/queries';
+import { auth, unstable_update  } from '@/lib/next-auth';
+import { convertErrorZodResultToMsgArray } from '@/utils/zod';
+import { revalidateProfilePath } from '@/utils/cache';
+import { ExtendedError } from '@/utils/errors';
+import pg from '@/lib/postgres/queries';
 
 export async function changeProfileInfo(newInfo: ProfileNewInfo) {
   const session = await auth() as SessionWithBaseData;
@@ -55,7 +55,7 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
         const fixedAlias = alias && alias.toLowerCase() || sessionAlias as string;
 
         // Find user with same custom alias
-        const userWithSameAlias = await dbQueries.getUserByAlias(fixedAlias);
+        const userWithSameAlias = await pg.getUserByAlias(fixedAlias);
         const isNotSameUser = sessionUuid !== userWithSameAlias?.uuid;
         if (userWithSameAlias?.alias_custom && isNotSameUser) {
           throw new ExtendedError(400, 'URL alias already in use');
@@ -82,7 +82,7 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
         }
 
         // Update user profile
-        const dbUser = await dbQueries.updateProfileInfo(newInfo);
+        const dbUser = await pg.updateProfileInfo(newInfo);
 
         // Revalidate cache
         if (dbUser) {

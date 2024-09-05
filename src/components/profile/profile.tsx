@@ -19,7 +19,7 @@ import Button from '@/components/[common-ui]/button';
 import Avatar from '@/components/[common-ui]/avatar';
 import ProfileModal from '@/components/profile/profile-modal';
 import ContentLimiter from '@/components/[body-children]/content-limiter';
-import { classesBeautify } from '@/lib/utils';
+import { classesBeautify } from '@/utils/styles';
 import * as actions from '@/actions';
 
 const changeCoverData = {
@@ -47,11 +47,11 @@ export default function Profile({ data, onSaveData }: Props) {
   const { isAuthenticatedToEdit, providerStamp, name, avatar, cover, about } = data;
   const isCoverExist = !!cover;
 
-  const [errorMsg, setErrorMsg] = useState(searchParams.get('error') || null);
+  const [ errorMsg, setErrorMsg ] = useState(searchParams.get('error') || null);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCoverChangeInProcess, setIsCoverChangeInProcess] = useState(false);
-  const [isAvatarChangeInProcess, setIsAvatarChangeInProcess] = useState(false);
+  const [ isModalOpen, setIsModalOpen ] = useState(false);
+  const [ isCoverChangeInProcess, setIsCoverChangeInProcess ] = useState(false);
+  const [ isAvatarChangeInProcess, setIsAvatarChangeInProcess ] = useState(false);
 
   const coverFileInputRef = useRef<HTMLInputElement>(null);
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
