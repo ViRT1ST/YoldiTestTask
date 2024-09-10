@@ -1,7 +1,13 @@
 import bcrypt from 'bcryptjs';
 
-import type { DbUserOrUndef, OauthProviders, DbUser, ProfileNewInfo } from '@/types';
+import type {
+  DbUserOrUndef,
+  OauthProviders,
+  DbUser,
+  ProfileNewInfo
+} from '@/types';
 import { defaultUsers } from '@/lib/postgres/populate/users';
+import { createQueryToPopulateTable } from '@/utils/postgres';
 import executeQuery from './executor';
 
 /* =============================================================
@@ -178,7 +184,7 @@ async function updateProfileInfo(newInfo: ProfileNewInfo) {
 async function changeProfileCover(uuid: string, imageUrl: string) {
   const query = `
     UPDATE yoldi_users
-    SET profile_cover = $2
+    SET updated_at = NOW(), profile_cover = $2
     WHERE uuid = $1
   `;
 
@@ -189,7 +195,7 @@ async function changeProfileCover(uuid: string, imageUrl: string) {
 async function deleteProfileCover(uuid: string) {
   const query = `
     UPDATE yoldi_users
-    SET profile_cover = NULL
+    SET updated_at = NOW(), profile_cover = NULL
     WHERE uuid = $1
   `;
 
@@ -200,7 +206,7 @@ async function deleteProfileCover(uuid: string) {
 async function changeProfileAvatar(uuid: string, imageUrl: string) {
   const query = `
     UPDATE yoldi_users
-    SET avatar = $2
+    SET updated_at = NOW(), avatar = $2
     WHERE uuid = $1
   `;
 
@@ -213,25 +219,10 @@ async function resetUsersTable() {
     await createUsersTable();
     await clearUsersTable();
 
-    type UserForMapping = {
-      [key: string]: any;
-    };
-
-    // Get the columns from the first user
-    const columns = Object.keys(defaultUsers[0]);
-
-    // Create array vith concatenated values as string
-    const values = defaultUsers.map((user: UserForMapping) => (
-      `(${columns.map((c) => user[c] !== null ? `'${user[c]}'` : 'NULL').join(', ')})`
-    ));
-
-    const query = `
-      INSERT INTO yoldi_users (${columns.join(', ')})
-      VALUES ${values.join(', ')};
-    `;
-
+    const query = createQueryToPopulateTable(defaultUsers, 'yoldi_users');
     await executeQuery(query);
-  } catch {
+    
+  } catch (error: any) {
     // Silence the error
   }
 }

@@ -1,18 +1,18 @@
 'use server';
 
-import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
-import type {
+import {
   ProfileNewInfo,
   SessionWithBaseData,
   SessionWithUpdateData,
-  ErrorForRedirect
+  ErrorForRedirect,
+  UpdateProfileSchema
 } from '@/types';
 import { auth, unstable_update  } from '@/lib/next-auth';
 import { convertErrorZodResultToMsgArray } from '@/utils/zod';
 import { revalidateProfilePath } from '@/utils/cache';
-import { ExtendedError } from '@/utils/errors';
+import { ERRORS, ExtendedError } from '@/utils/errors';
 import pg from '@/lib/postgres/queries';
 
 export async function changeProfileInfo(newInfo: ProfileNewInfo) {
@@ -24,24 +24,8 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
   let returnError: ErrorForRedirect = null;
 
   if (sessionUuid) {
-    const updateInfoSchema = z.object({
-      name: z
-        .string()
-        .trim()
-        .min(3, { message: 'Name must be at least 3 characters'}),
-      alias: z
-        .string()
-        .trim()
-        .min(3, { message: 'URL alias must be at least 3 characters'})
-        .optional()
-        .or(z.literal('')),
-      about: z
-        .string()
-        .min(1, { message: 'About must be at least 1 characters'})
-    });
-
     try {
-      const result = updateInfoSchema.safeParse(newInfo);
+      const result = UpdateProfileSchema.safeParse(newInfo);
 
       // Throw error if validation fails
       if (!result.success) {
@@ -57,8 +41,9 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
         // Find user with same custom alias
         const userWithSameAlias = await pg.getUserByAlias(fixedAlias);
         const isNotSameUser = sessionUuid !== userWithSameAlias?.uuid;
+
         if (userWithSameAlias?.alias_custom && isNotSameUser) {
-          throw new ExtendedError(400, 'URL alias already in use');
+          throw new ExtendedError(...ERRORS.notAllowedAlias);
         }
 
         const newInfo: ProfileNewInfo = {
@@ -72,9 +57,7 @@ export async function changeProfileInfo(newInfo: ProfileNewInfo) {
         const isSameAliasAsSession = fixedAlias === sessionAlias;
 
         if (!isSameAliasAsSession && !isValidAlias) {
-          throw new ExtendedError(
-            400, 'URL alias must contain only letters and numbers and cannot start with "id"'
-          );
+          throw new ExtendedError(...ERRORS.invalidAlias);
         }
 
         if (!isSameAliasAsSession) {

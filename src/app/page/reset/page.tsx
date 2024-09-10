@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import * as actions from '@/actions';
 
 export const metadata = {
-  title: 'Yoldi Main Page',
+  title: 'Yoldi Reset Page',
 };
 
 export default async function MainPage() {

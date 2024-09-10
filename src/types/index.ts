@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { REGISTRATION_STRING, LOGIN_STRING } from '@/config/public';
+import { ERRORS } from '@/utils/errors';
 
 /* =============================================================
 Database Schemas And Types
@@ -10,16 +11,16 @@ export type DbUser = {
   id: number;
   uuid: string;
   default_auth_provider: string;
-  google_id: string;
-  github_id: string;
-  auth_email: string;
-  auth_password: string;
+  google_id: string | null;
+  github_id: string | null;
+  auth_email: string | null;
+  auth_password: string | null;
   alias_default: string;
-  alias_custom: string;
+  alias_custom: string | null;
   name: string;
-  avatar: string;
-  profile_cover: string;
-  profile_about: string;
+  avatar: string | null;
+  profile_cover: string | null;
+  profile_about: string | null;
   is_verified: boolean;
   is_admin: boolean;
   created_at: Date;
@@ -42,6 +43,10 @@ export type CatchAllSlug = {
   params: {
     'slug': string[]
   }
+};
+
+export type ObjectWithAnyData = {
+  [key: string]: any;
 };
 
 /* =============================================================
@@ -133,3 +138,38 @@ export type ErrorForRedirect = {
   message: string;
   code: number
 } | null;
+
+export const CredentialsLoginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email({ message: ERRORS.zodNotEmail[1] })
+    .min(5, { message: ERRORS.zodBadEmail[1] }),
+  password: z
+    .string()
+    .trim()
+    .min(8, { message: ERRORS.zodBadPassword[1] })
+});
+
+export const CredentialsRegistrationSchema = CredentialsLoginSchema.extend({
+  name: z
+    .string()
+    .trim()
+    .min(3, { message: ERRORS.zodBadName[1] })
+});
+
+export const UpdateProfileSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, { message: ERRORS.zodBadName[1] }),
+  alias: z
+    .string()
+    .trim()
+    .min(3, { message: ERRORS.zodBadAlias[1] })
+    .optional()
+    .or(z.literal('')),
+  about: z
+    .string()
+    .min(1, { message: ERRORS.zodBadAbout[1] })
+});

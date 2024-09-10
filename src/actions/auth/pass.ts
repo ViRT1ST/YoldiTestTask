@@ -2,40 +2,30 @@
 
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
-import { z } from 'zod';
 
-import type {
+import {
   SessionWithProviderData,
   SessionWithUpdateData,
   ErrorForRedirect,
-  DbUser
+  DbUser,
+  CredentialsLoginSchema,
+  CredentialsRegistrationSchema
 } from '@/types';
 import { auth, signOut, unstable_update} from '@/lib/next-auth';
 import { convertErrorZodResultToMsgArray } from '@/utils/zod';
 import { revalidateProfilePath } from '@/utils/cache';
-import { ExtendedError } from '@/utils/errors';
+import { ERRORS, ExtendedError } from '@/utils/errors';
 import pg from '@/lib/postgres/queries';
-
-const defaultError = {
-  message: 'Failed to authenticate',
-  code: 401
-};
 
 export async function authorizeUser() {
   let session = await auth() as SessionWithProviderData;
 
-  if (!session) {
-    return signOut({
-      redirectTo: `/page/auth?error=${defaultError.message}&code=${defaultError.code}`
-    });
-  }
-
   const providerData = session?.user?.provider_data;
   const authProvider = session?.user?.iss;
 
-  if (!providerData) {
+  if (!session || !providerData) {
     return signOut({
-      redirectTo: `/page/auth?error=${defaultError.message}&code=${defaultError.code}`
+      redirectTo:  `/page/auth?error=${ERRORS.authFailed[1]}&code=${ERRORS.authFailed[0]}`
     });
   }
 
@@ -57,23 +47,7 @@ export async function authorizeUser() {
 
       // Registration form
       if (isRegistrationPage) {
-        const registrationSchema = z.object({
-          name: z
-            .string()
-            .trim()
-            .min(3, { message: 'Name must be at least 5 characters'}),
-          email: z
-            .string()
-            .trim()
-            .email({ message: 'Valid email is required'})
-            .min(5, { message: 'Email must be at least 5 characters'}),
-          password: z
-            .string()
-            .trim()
-            .min(8, { message: 'Password must be at least 8 characters'})
-        });
-
-        const result = registrationSchema.safeParse({ name, email, password });
+        const result = CredentialsRegistrationSchema.safeParse({ name, email, password });
       
         // Throw error if validation fails
         if (!result.success) {
@@ -87,7 +61,7 @@ export async function authorizeUser() {
           // Found existing user -> throw error
           // User not found -> new user registration
           if (dbUser) {
-            throw new ExtendedError(400, 'User already exists');
+            throw new ExtendedError(...ERRORS.userAlreadyExists);
 
           } else {
             dbUser = await pg.createUserByAuthEmail(
@@ -97,7 +71,7 @@ export async function authorizeUser() {
             );
 
             if (!dbUser) {
-              throw new ExtendedError(400, 'Error creating new user');
+              throw new ExtendedError(...ERRORS.userCreatingFailed);
             } else {
               // all ok, revalidate cache
               revalidateProfilePath(dbUser);
@@ -108,17 +82,7 @@ export async function authorizeUser() {
 
       // Login form
       if (!isRegistrationPage) {
-        const loginSchema = z.object({
-          email: z
-            .string()
-            .email({ message: 'Valid email is required'})
-            .min(5, { message: 'Email must be at least 5 characters'}),
-          password: z
-            .string()
-            .min(8, { message: 'Password must be at least 8 characters'})
-        });
-
-        const result = loginSchema.safeParse({ email, password });
+        const result = CredentialsLoginSchema.safeParse({ email, password });
       
         // Throw error if validation fails
         if (!result.success) {
@@ -130,7 +94,7 @@ export async function authorizeUser() {
           dbUser = await pg.getUserByAuthEmail(result.data.email);
 
           if (!dbUser) {
-            throw new ExtendedError(400, 'User not found');
+            throw new ExtendedError(...ERRORS.userNotFound);
 
           } else {
             const match = await bcrypt.compare(
@@ -139,7 +103,7 @@ export async function authorizeUser() {
             );
 
             if (!match) {
-              throw new ExtendedError(400, 'Password is invalid');
+              throw new ExtendedError(...ERRORS.invalidPassword);
             } else {
               // all ok, revalidate cache
               revalidateProfilePath(dbUser);
@@ -187,8 +151,7 @@ export async function authorizeUser() {
     }
 
     if (!userId || !userName || !userAvatar) {
-      const msgIss = authProvider.charAt(0).toUpperCase() + authProvider.slice(1);
-      throw new ExtendedError(400, `Invalid user info from your ${msgIss} account`);
+      throw new ExtendedError(...ERRORS.invalidOAuthInfo);
 
     } else {
       try {
@@ -198,7 +161,7 @@ export async function authorizeUser() {
           dbUser = await pg.createUserByAuthId(authProvider, userId, userName, userAvatar);
 
           if (!dbUser) {
-            throw new ExtendedError(400, 'Error creating new user');
+            throw new ExtendedError(...ERRORS.userCreatingFailed);
           } else {
             // all ok, revalidate cache
             revalidateProfilePath(dbUser);
@@ -241,7 +204,7 @@ export async function authorizeUser() {
 
   if (authError) {
     const method = `method=${isRegistrationPage ? 'registration' : 'login'}`;
-    const error = `error=${authError?.message}`;
+    const error = `error=${authError.message}`;
     const code = `code=${authError.code}`;
 
     return signOut({
