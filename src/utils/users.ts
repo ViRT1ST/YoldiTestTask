@@ -1,4 +1,4 @@
-export function makeUserProviderStamp(provider: string, authEmail: string) {
+export function makeUserProviderStamp(provider: string, authEmail: string | null) {
   let providerStamp = '';
 
   switch (provider) {
