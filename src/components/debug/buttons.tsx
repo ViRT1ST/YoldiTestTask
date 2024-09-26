@@ -31,13 +31,15 @@ export default function Buttons() {
   const [ loggedIn, setIsLoggedIn ] = useState(false);
 
   useEffect(() => {
-    setIsLoggedIn(Boolean(name));
+    if (name) {
+      setIsLoggedIn(true);
+    }
   }, [name]);
 
   return (
     <div className="mb-20">
 
-      {user && loggedIn ? (
+      {loggedIn ? (
         <DebugButton
           label={`${name}: [Sign out]`}
           onClick={() => {

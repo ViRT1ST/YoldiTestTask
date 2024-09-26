@@ -13,7 +13,7 @@ export class ExtendedError extends Error {
 
 export const ERRORS: Record<string, [number, string]> = {
   zodNotEmail: [
-    404, 'Valid email is required'
+    400, 'Valid email is required'
   ],
   zodBadEmail: [
     400, 'Email must be at least 5 characters'
@@ -39,19 +39,19 @@ export const ERRORS: Record<string, [number, string]> = {
   emailAlreadyExist: [
     400, 'User with this email already exist'
   ],
-  userCreatingFailed: [
-    500, 'Error creating new user'
-  ],
   emailNotFound: [
     404, 'User with this email not exist'
   ],
   invalidPassword: [
     400, 'Invalid password'
   ],
+  userCreatingFailed: [
+    401, 'Failed to create new user'
+  ],
   invalidOAuthInfo: [
-    400, 'Invalid user info from your third party account'
+    401, 'Invalid user info from your third party account'
   ],
   authFailed: [
-    400, 'Failed to authenticate'
+    401, 'Failed to authenticate'
   ],
 };
