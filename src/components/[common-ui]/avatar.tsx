@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import { classesBeautify } from '@/utils/styles';
 
-type Props = React.ComponentProps<'div'> & {
+type Props = React.ComponentPropsWithoutRef<'div'> & {
   url: string | null | undefined;
   name: string | null | undefined;
   showBorder?: boolean;

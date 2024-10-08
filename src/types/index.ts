@@ -45,9 +45,7 @@ export type CatchAllSlug = {
   }
 };
 
-export type ObjectWithAnyData = {
-  [key: string]: any;
-};
+export type ObjectWithAnyData = Record<string, any>;
 
 /* =============================================================
 Other
@@ -71,7 +69,7 @@ export type SessionMainFields = {
 
 export type SessionWithBaseData = ({
   user: SessionMainFields
-}) | null;
+});
 
 export type SessionWithProviderData = SessionWithBaseData & {
   user: {

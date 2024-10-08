@@ -1,6 +1,6 @@
 import { twMerge } from 'tailwind-merge';
 
-type ContentLimiterProps = React.ComponentProps<'button'>;
+type ContentLimiterProps = React.ComponentPropsWithoutRef<'main'>;
 
 export default function ContentLimiter({ children, className, ...rest }: ContentLimiterProps) {
   return (

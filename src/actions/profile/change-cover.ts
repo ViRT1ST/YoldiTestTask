@@ -12,7 +12,7 @@ export async function changeProfileCover(formData: FormData) {
 }
 
 export async function deleteProfileCover() {
-  const session = await auth() as SessionWithBaseData;
+  const session = await auth() as SessionWithBaseData | null;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 

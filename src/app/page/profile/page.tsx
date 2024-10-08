@@ -4,11 +4,15 @@ export const metadata = {
   title: 'Yoldi Profile Page',
 };
 
+// type Props = {
+//   searchParams?: {
+//     error?: string;
+//     code?: string;
+//   } | null | undefined;
+// };
+
 type Props = {
-  searchParams?: {
-    error?: string;
-    code?: string;
-  } | null | undefined;
+  searchParams: { [key: string]: string | string[] | undefined }
 };
 
 export default function RedirectToProfileSlug({ searchParams }: Props) {

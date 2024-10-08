@@ -1,6 +1,6 @@
 import { twMerge } from 'tailwind-merge';
 
-type Props = React.ComponentProps<'main'>;
+type Props = React.ComponentPropsWithoutRef<'main'>;
 
 export default function ContentWrapper({ children, className, ...rest }: Props) {
   return (

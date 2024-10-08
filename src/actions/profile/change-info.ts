@@ -16,7 +16,7 @@ import { ERRORS, ExtendedError } from '@/utils/errors';
 import pg from '@/lib/postgres/queries';
 
 export async function changeProfileInfo(newInfo: ProfileNewInfo) {
-  const session = await auth() as SessionWithBaseData;
+  const session = await auth() as SessionWithBaseData | null;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
   const sessionAlias = sessionUser?.alias;

@@ -18,7 +18,7 @@ import { ERRORS, ExtendedError } from '@/utils/errors';
 import pg from '@/lib/postgres/queries';
 
 export async function authorizeUser() {
-  let session = await auth() as SessionWithProviderData;
+  let session = await auth() as SessionWithProviderData | null;
 
   const providerData = session?.user?.provider_data;
   const authProvider = session?.user?.iss;

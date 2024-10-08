@@ -126,7 +126,7 @@ export default function Profile({ data, onSaveData }: Props) {
             <input
               ref={coverFileInputRef}
               className="hidden"
-              onChange={(e) => coverInputFileHandler(e)}
+              onChange={coverInputFileHandler}
               type="file"
               accept="image/png, image/jpeg"
               name="file"
@@ -188,7 +188,7 @@ export default function Profile({ data, onSaveData }: Props) {
               <input
                 ref={avatarFileInputRef}
                 className="hidden"
-                onChange={(e) => avatarInputFileHandler(e)}
+                onChange={avatarInputFileHandler}
                 type="file"
                 accept="image/png, image/jpeg"
                 name="file"

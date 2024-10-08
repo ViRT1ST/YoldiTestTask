@@ -19,17 +19,17 @@ export const authConstants = {
 };
 
 type Props = {
-  children: React.ReactNode;
+  children: JSX.Element;
 };
 
 export default async function YoldiLayout({ children }: Props) {
-  const session = await auth() as SessionWithBaseData;
+  const session = await auth() as SessionWithBaseData | null;
   const sessionUser = session?.user;
 
   return (
     <div className="w-full h-full min-h-screen flex flex-col font-inter">
       <Header authConstants={authConstants} userData={sessionUser || null} />
-        {children}
+      {children}
       <Footer authConstants={authConstants} />
     </div>
   );

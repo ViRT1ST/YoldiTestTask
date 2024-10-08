@@ -57,7 +57,6 @@ export default function Buttons() {
       <DebugButton
         label="Auth with Google"
         onClick={() => actions.googleSignIn()}
-      
       />
 
       <DebugButton

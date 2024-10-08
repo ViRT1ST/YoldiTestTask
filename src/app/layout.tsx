@@ -46,7 +46,7 @@ const rootLayoutClasses = [
 ];
 
 type Props = {
-  children: React.ReactNode;
+  children: JSX.Element;
 };
 
 export default function RootLayout({ children } : Props) {

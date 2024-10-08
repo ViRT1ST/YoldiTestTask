@@ -25,7 +25,7 @@ const defaultAboutText = `
 `.replace(/\s+/g, ' ').trim();
 
 export default async function ProfilePage({ params }: Slug) {
-  const session = await auth() as SessionWithBaseData;
+  const session = await auth() as SessionWithBaseData | null;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 

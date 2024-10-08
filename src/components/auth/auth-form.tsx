@@ -16,20 +16,19 @@ import { REGISTRATION_STRING, LOGIN_STRING } from '@/config/public';
 import { classesBeautify } from '@/utils/styles';
 import * as actions from '@/actions';
 
-const pageDataSwitch = {
-  [REGISTRATION_STRING]: {
-    title: 'Регистрация\nв Yoldi Agency',
-    submitButtonText: 'Создать аккаунт',
-    submitButtonTooltip: 'Создать аккаунт используя почту и пароль',
-    updateUrlOnPageLoad: `?method=${REGISTRATION_STRING}`,
-  },
-  [LOGIN_STRING]: {
-    title: 'Вход в Yoldi Agency',
-    submitButtonText: 'Войти',
-    submitButtonTooltip: 'Войти в аккаунт используя почту и пароль',
-    updateUrlOnPageLoad: `?method=${LOGIN_STRING}`,
-  },
-};
+const loginPageConfig = {
+  title: 'Вход в Yoldi Agency',
+  submitButtonText: 'Войти',
+  submitButtonTooltip: 'Войти в аккаунт используя почту и пароль',
+  updateUrlOnPageLoad: `?method=${LOGIN_STRING}`,
+} as const;
+
+const registrationPageConfig = {
+  title: 'Регистрация\nв Yoldi Agency',
+  submitButtonText: 'Создать аккаунт',
+  submitButtonTooltip: 'Создать аккаунт используя почту и пароль',
+  updateUrlOnPageLoad: `?method=${REGISTRATION_STRING}`,
+} as const;
 
 const defaultInputValues = {
   name: '', // 'Владислав',
@@ -48,6 +47,7 @@ export default function AuthForm() {
   const formUrl = `${pathname}?method=${urlMethod}`;
 
   const isRegistrationPage = urlMethod === REGISTRATION_STRING;
+  const pageConfig = isRegistrationPage ? registrationPageConfig : loginPageConfig;
 
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -59,10 +59,6 @@ export default function AuthForm() {
 
   const [ errorMsg, setErrorMsg ] = useState(urlErrorMessage || null);
   
-  const pageData = isRegistrationPage
-    ? pageDataSwitch[REGISTRATION_STRING]
-    : pageDataSwitch[LOGIN_STRING];
-
   const isPasswordEmpty = password == '';
 
   const isFieldsFilledForRegistration = !!name && !!email && !!password;
@@ -74,7 +70,7 @@ export default function AuthForm() {
 
   useEffect(() => {
     if (!urlMethod) {
-      router.push(pageData.updateUrlOnPageLoad);
+      router.push(pageConfig.updateUrlOnPageLoad);
     }
   }, []);
 
@@ -94,7 +90,7 @@ export default function AuthForm() {
 
   return (
     <div className={twContainer}>
-      <h1 className={twTitle}>{pageData.title}</h1>
+      <h1 className={twTitle}>{pageConfig.title}</h1>
 
       <form action={actions.credetialsSignIn.bind(null, { form_url: formUrl })}>
 
@@ -174,12 +170,12 @@ export default function AuthForm() {
         <Button 
           className="w-full"
           type="submit"
-          title={pageData.submitButtonTooltip}
+          title={pageConfig.submitButtonTooltip}
           size="big"
           colors="dark"
           disabled={!isFieldsFilled}
         >
-          {pageData.submitButtonText}
+          {pageConfig.submitButtonText}
         </Button>
 
       </form>

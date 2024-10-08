@@ -17,7 +17,7 @@ type Props = {
 };
 
 export async function changeProfileImage({ formData, imageToChange }: Props) {
-  const session = await auth() as SessionWithBaseData;
+  const session = await auth() as SessionWithBaseData | null;
   const sessionUser = session?.user;
   const sessionUuid = sessionUser?.uuid;
 
